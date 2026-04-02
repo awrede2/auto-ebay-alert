@@ -1,0 +1,47 @@
+# ── Global defaults (applied to all alerts) ───────────────────────────────────
+global_defaults:
+  min_seller_feedback: 95       # minimum seller feedback percentage
+  min_seller_transactions: 25   # minimum number of completed transactions
+  cooldown_hours: 24            # hours before re-alerting on the same listing
+
+# ── Search alerts ─────────────────────────────────────────────────────────────
+# condition options: new | like_new | used | any
+# buying_options:   BUY_IT_NOW | BEST_OFFER (can combine both)
+# required_grade:   must appear in listing title (optional)
+# exclude_keywords: skip listings containing these words (optional)
+
+alerts:
+  - keywords: "Sony WH-1000XM5"
+    condition: used
+    exclude_keywords: [broken, parts only, for parts, cracked]
+    tiers:
+      - label: "Steal"
+        max_price: 120
+        buying_options: [BUY_IT_NOW]
+      - label: "Good deal"
+        max_price: 160
+        buying_options: [BUY_IT_NOW, BEST_OFFER]
+
+  - keywords: "Leica M3"
+    condition: any
+    exclude_keywords: [replica, fake, reproduction]
+    tiers:
+      - label: "Steal"
+        max_price: 600
+        buying_options: [BUY_IT_NOW]
+      - label: "Worth an offer"
+        max_price: 900
+        buying_options: [BUY_IT_NOW, BEST_OFFER]
+
+  # Example graded card search
+  # - keywords: "Charizard Holo 1st Edition"
+  #   condition: any
+  #   required_grade: "PSA 8"
+  #   exclude_keywords: [fake, reprint, copy, damaged]
+  #   tiers:
+  #     - label: "Steal"
+  #       max_price: 400
+  #       buying_options: [BUY_IT_NOW]
+  #     - label: "Worth an offer"
+  #       max_price: 600
+  #       buying_options: [BUY_IT_NOW, BEST_OFFER]
