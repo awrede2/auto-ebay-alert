@@ -2,7 +2,7 @@ global_defaults:
   min_seller_feedback: 95
   min_seller_transactions: 25
   cooldown_hours: 72
-  
+
 alerts:
   - keywords: "1999 Charizard PSA 8"
     condition: any
