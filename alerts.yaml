@@ -10,7 +10,7 @@ global_defaults:
 # required_grade:   must appear in listing title (optional)
 # exclude_keywords: skip listings containing these words (optional)
 
-- keywords: "1999 Charizard Base Set 4/102 PSA 8"
+- keywords: "1999 Charizard 4 PSA 8"
     condition: any
     required_grade: "PSA 8"
     exclude_keywords: [Japanese, sticker, artbox, flipz, battle sense, 
@@ -26,7 +26,7 @@ global_defaults:
         max_price: 1300
         buying_options: [BUY_IT_NOW, BEST_OFFER]
 
-- keywords: "1999 Charizard Base Set 4/102 PSA 7"
+- keywords: "1999 Charizard 4 PSA 7"
     condition: any
     required_grade: "PSA 7"
     exclude_keywords: [Japanese, sticker, artbox, flipz, battle sense, 
