@@ -11,26 +11,30 @@ global_defaults:
 # exclude_keywords: skip listings containing these words (optional)
 
 alerts:
-  - keywords: "Sony WH-1000XM5"
-    condition: used
-    exclude_keywords: [broken, parts only, for parts, cracked]
-    tiers:
-      - label: "Steal"
-        max_price: 120
-        buying_options: [BUY_IT_NOW]
-      - label: "Good deal"
-        max_price: 160
-        buying_options: [BUY_IT_NOW, BEST_OFFER]
-
-  - keywords: "Leica M3"
+  - keywords: "1999 Charizard 4 PSA 8"
     condition: any
-    exclude_keywords: [replica, fake, reproduction]
+    exclude_keywords: [replica, fake, reproduction, topps, Beckett]
     tiers:
       - label: "Steal"
-        max_price: 600
+        min_price: 200          # ignore anything suspiciously cheap        
+        max_price: 1100
         buying_options: [BUY_IT_NOW]
       - label: "Worth an offer"
-        max_price: 900
+        min_price: 200          # ignore anything suspiciously cheap      
+        max_price: 1300
+        buying_options: [BUY_IT_NOW, BEST_OFFER]
+
+  - keywords: "1999 Charizard 4 PSA 7"
+    condition: any
+    exclude_keywords: [replica, fake, reproduction, topps, Beckett]
+    tiers:
+      - label: "Steal"
+        min_price: 200          # ignore anything suspiciously cheap        
+        max_price: 650
+        buying_options: [BUY_IT_NOW]
+      - label: "Worth an offer"
+        min_price: 200          # ignore anything suspiciously cheap      
+        max_price: 700
         buying_options: [BUY_IT_NOW, BEST_OFFER]
 
   # Example graded card search
