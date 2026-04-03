@@ -2,7 +2,7 @@
 global_defaults:
   min_seller_feedback: 95       # minimum seller feedback percentage
   min_seller_transactions: 25   # minimum number of completed transactions
-  cooldown_hours: 24            # hours before re-alerting on the same listing
+  cooldown_hours: 72            # hours before re-alerting on the same listing
 
 # ── Search alerts ─────────────────────────────────────────────────────────────
 # condition options: new | like_new | used | any
