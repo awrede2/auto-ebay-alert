@@ -1,32 +1,51 @@
+# ── Global defaults (applied to all alerts) ───────────────────────────────────
 global_defaults:
-  min_seller_feedback: 95
-  min_seller_transactions: 25
-  cooldown_hours: 72
+  min_seller_feedback: 95       # minimum seller feedback percentage
+  min_seller_transactions: 25   # minimum number of completed transactions
+  cooldown_hours: 24            # hours before re-alerting on the same listing
+
+# ── Search alerts ─────────────────────────────────────────────────────────────
+# condition options: new | like_new | used | any
+# buying_options:   BUY_IT_NOW | BEST_OFFER (can combine both)
+# required_grade:   must appear in listing title (optional)
+# exclude_keywords: skip listings containing these words (optional)
 
 alerts:
   - keywords: "1999 Charizard 4 PSA 8"
     condition: any
-    required_grade: "PSA 8"
-    exclude_keywords: [Japanese, sticker, artbox, flipz, reverse holo, wimpod, lapras, rhyhorn, skyridge]
+    exclude_keywords: [replica, fake, reproduction, topps, Beckett]
     tiers:
       - label: "Steal"
-        min_price: 800
-        max_price: 1000
+        min_price: 600          # ignore anything suspiciously cheap        
+        max_price: 1100
         buying_options: [BUY_IT_NOW]
       - label: "Worth an offer"
-        min_price: 800
+        min_price: 600          # ignore anything suspiciously cheap      
         max_price: 1300
         buying_options: [BUY_IT_NOW, BEST_OFFER]
+
   - keywords: "1999 Charizard 4 PSA 7"
     condition: any
-    required_grade: "PSA 7"
-    exclude_keywords: [Japanese, sticker, artbox, flipz, reverse holo, wimpod, lapras, rhyhorn, skyridge]
+    exclude_keywords: [replica, fake, reproduction, topps, Beckett]
     tiers:
       - label: "Steal"
-        min_price: 450
+        min_price: 500          # ignore anything suspiciously cheap        
         max_price: 650
         buying_options: [BUY_IT_NOW]
       - label: "Worth an offer"
-        min_price: 450
+        min_price: 500          # ignore anything suspiciously cheap      
         max_price: 700
         buying_options: [BUY_IT_NOW, BEST_OFFER]
+
+  # Example graded card search
+  # - keywords: "Charizard Holo 1st Edition"
+  #   condition: any
+  #   required_grade: "PSA 8"
+  #   exclude_keywords: [fake, reprint, copy, damaged]
+  #   tiers:
+  #     - label: "Steal"
+  #       max_price: 400
+  #       buying_options: [BUY_IT_NOW]
+  #     - label: "Worth an offer"
+  #       max_price: 600
+  #       buying_options: [BUY_IT_NOW, BEST_OFFER]
