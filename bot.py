@@ -21,12 +21,13 @@ TWILIO_SID         = os.environ["TWILIO_ACCOUNT_SID"]
 TWILIO_TOKEN       = os.environ["TWILIO_AUTH_TOKEN"]
 TWILIO_FROM        = os.environ["TWILIO_FROM_NUMBER"]   # e.g. +18336144069
 ALERT_TO_NUMBER    = os.environ["ALERT_TO_NUMBER"]      # your personal number
-CONFIG_PATH        = os.environ.get("CONFIG_PATH", "alerts.yaml")
 SCAN_INTERVAL_SEC  = int(os.environ.get("SCAN_INTERVAL_SECONDS", 300))  # default 5 min
 
-# ── State files ───────────────────────────────────────────────────────────────
-SEEN_FILE    = "seen_listings.json"
-SELLERS_FILE = "seller_cache.json"
+# ── Paths (always relative to this script location) ───────────────────────────
+BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
+CONFIG_PATH  = os.environ.get("CONFIG_PATH", os.path.join(BASE_DIR, "alerts.yaml"))
+SEEN_FILE    = os.path.join(BASE_DIR, "seen_listings.json")
+SELLERS_FILE = os.path.join(BASE_DIR, "seller_cache.json")
 
 # ── eBay OAuth ────────────────────────────────────────────────────────────────
 _ebay_token     = None
@@ -144,10 +145,15 @@ def title_passes(title: str, required_grade: str | None, exclude_keywords: list)
 
 # ── Tier matching ─────────────────────────────────────────────────────────────
 def match_tier(item: dict, tiers: list) -> dict | None:
-    price         = float(item.get("price", {}).get("value", 9999999))
+    price          = float(item.get("price", {}).get("value", 9999999))
     buying_options = set(item.get("buyingOptions", []))
     for tier in tiers:
-        if price > tier["max_price"]:
+        min_price = float(tier.get("min_price", 0))
+        max_price = float(tier["max_price"])
+        if price < min_price:
+            log.debug("Price $%.2f below min_price $%.2f, skipping.", price, min_price)
+            continue
+        if price > max_price:
             continue
         required_options = set(tier.get("buying_options", ["BUY_IT_NOW"]))
         if required_options & buying_options:
@@ -245,6 +251,8 @@ def load_config(path: str) -> dict:
 
 def main():
     log.info("eBay Alert Bot starting. Scan interval: %ds", SCAN_INTERVAL_SEC)
+    log.info("Config path: %s", CONFIG_PATH)
+    log.info("Config exists: %s", os.path.exists(CONFIG_PATH))
     seen = load_json(SEEN_FILE)
 
     while True:
