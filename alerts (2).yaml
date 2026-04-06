@@ -1,0 +1,32 @@
+global_defaults:
+  min_seller_feedback: 95
+  min_seller_transactions: 25
+  cooldown_hours: 72
+
+alerts:
+  - keywords: "1999 Charizard 4 PSA 8"
+    condition: any
+    required_grade: "PSA 8"
+    exclude_keywords: [Japanese, sticker, artbox, flipz, reverse holo, wimpod, lapras, rhyhorn, skyridge]
+    tiers:
+      - label: "Steal"
+        min_price: 800
+        max_price: 1000
+        buying_options: [BUY_IT_NOW]
+      - label: "Worth an offer"
+        min_price: 800
+        max_price: 1300
+        buying_options: [BUY_IT_NOW, BEST_OFFER]
+  - keywords: "1999 Charizard 4 PSA 7"
+    condition: any
+    required_grade: "PSA 7"
+    exclude_keywords: [Japanese, sticker, artbox, flipz, reverse holo, wimpod, lapras, rhyhorn, skyridge]
+    tiers:
+      - label: "Steal"
+        min_price: 450
+        max_price: 650
+        buying_options: [BUY_IT_NOW]
+      - label: "Worth an offer"
+        min_price: 450
+        max_price: 700
+        buying_options: [BUY_IT_NOW, BEST_OFFER]
