@@ -3,7 +3,6 @@ import time
 import json
 import logging
 import requests
-import yaml
 from datetime import datetime, timedelta
 from twilio.rest import Client as TwilioClient
 
@@ -23,11 +22,39 @@ TWILIO_FROM        = os.environ["TWILIO_FROM_NUMBER"]   # e.g. +18336144069
 ALERT_TO_NUMBER    = os.environ["ALERT_TO_NUMBER"]      # your personal number
 SCAN_INTERVAL_SEC  = int(os.environ.get("SCAN_INTERVAL_SECONDS", 300))  # default 5 min
 
-# ── Paths (always relative to this script location) ───────────────────────────
+# ── Paths ─────────────────────────────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
-CONFIG_PATH  = os.environ.get("CONFIG_PATH", os.path.join(BASE_DIR, "alerts.yaml"))
 SEEN_FILE    = os.path.join(BASE_DIR, "seen_listings.json")
 SELLERS_FILE = os.path.join(BASE_DIR, "seller_cache.json")
+
+# ── Inline config (edit searches here, then commit to GitHub) ─────────────────
+CONFIG = {
+    "global_defaults": {
+        "min_seller_feedback": 95,
+        "min_seller_transactions": 25,
+        "cooldown_hours": 24,
+    },
+    "alerts": [
+        {
+            "keywords": "1999 Charizard 4 PSA 8",
+            "condition": "any",
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett"],
+            "tiers": [
+                {"label": "Steal",        "min_price": 600, "max_price": 1100, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 600, "max_price": 1300, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+        {
+            "keywords": "1999 Charizard 4 PSA 7",
+            "condition": "any",
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett"],
+            "tiers": [
+                {"label": "Steal",        "min_price": 500, "max_price": 650, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 500, "max_price": 700, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+    ],
+}
 
 # ── eBay OAuth ────────────────────────────────────────────────────────────────
 _ebay_token     = None
@@ -245,61 +272,13 @@ def run_scan(config: dict, seen: dict):
 
         log.info("  → %d new matches alerted", matched)
 
-def load_config(path: str) -> dict:
-    """Load from YAML file, falling back to built-in default config."""
-    import os
-    # Try the file first
-    for candidate in [path, "/app/alerts.yaml", os.path.join(os.path.dirname(os.path.abspath(__file__)), "alerts.yaml")]:
-        if os.path.exists(candidate):
-            try:
-                with open(candidate) as f:
-                    data = yaml.safe_load(f)
-                if data and "alerts" in data:
-                    log.info("Loaded config from %s", candidate)
-                    return data
-            except Exception as e:
-                log.warning("Could not load %s: %s", candidate, e)
-    log.warning("No valid config file found — using built-in default config.")
-    return {
-        "global_defaults": {
-            "min_seller_feedback": 95,
-            "min_seller_transactions": 25,
-            "cooldown_hours": 72,
-        },
-        "alerts": [
-            {
-                "keywords": "1999 Charizard 4 PSA 8",
-                "condition": "any",
-                "required_grade": "PSA 8",
-                "exclude_keywords": ["Japanese", "sticker", "artbox", "flipz", "reverse holo", "wimpod", "lapras", "rhyhorn", "skyridge"],
-                "tiers": [
-                    {"label": "Steal", "min_price": 800, "max_price": 1000, "buying_options": ["BUY_IT_NOW"]},
-                    {"label": "Worth an offer", "min_price": 800, "max_price": 1300, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-                ],
-            },
-            {
-                "keywords": "1999 Charizard 4 PSA 7",
-                "condition": "any",
-                "required_grade": "PSA 7",
-                "exclude_keywords": ["Japanese", "sticker", "artbox", "flipz", "reverse holo", "wimpod", "lapras", "rhyhorn", "skyridge"],
-                "tiers": [
-                    {"label": "Steal", "min_price": 450, "max_price": 650, "buying_options": ["BUY_IT_NOW"]},
-                    {"label": "Worth an offer", "min_price": 450, "max_price": 700, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-                ],
-            },
-        ],
-    }
-
 def main():
     log.info("eBay Alert Bot starting. Scan interval: %ds", SCAN_INTERVAL_SEC)
-    log.info("Config path: %s", CONFIG_PATH)
-    log.info("Config exists: %s", os.path.exists(CONFIG_PATH))
     seen = load_json(SEEN_FILE)
 
     while True:
         try:
-            config = load_config(CONFIG_PATH)
-            run_scan(config, seen)
+            run_scan(CONFIG, seen)
             save_json(SEEN_FILE, seen)
         except Exception as e:
             log.error("Unexpected error during scan: %s", e)
