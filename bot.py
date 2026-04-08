@@ -4,7 +4,6 @@ import json
 import logging
 import requests
 from datetime import datetime, timedelta
-from twilio.rest import Client as TwilioClient
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,10 +15,9 @@ log = logging.getLogger(__name__)
 # ── Environment variables (set in Railway) ────────────────────────────────────
 EBAY_CLIENT_ID     = os.environ["EBAY_CLIENT_ID"]
 EBAY_CLIENT_SECRET = os.environ["EBAY_CLIENT_SECRET"]
-TWILIO_SID         = os.environ["TWILIO_ACCOUNT_SID"]
-TWILIO_TOKEN       = os.environ["TWILIO_AUTH_TOKEN"]
-TWILIO_FROM        = os.environ["TWILIO_FROM_NUMBER"]   # e.g. +18336144069
-ALERT_TO_NUMBER    = os.environ["ALERT_TO_NUMBER"]      # your personal number
+GMAIL_ADDRESS      = os.environ["GMAIL_ADDRESS"]       # your gmail address
+GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]   # 16-char app password
+ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]       # email to receive alerts
 SCAN_INTERVAL_SEC  = int(os.environ.get("SCAN_INTERVAL_SECONDS", 300))  # default 5 min
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
@@ -31,7 +29,7 @@ SELLERS_FILE = os.path.join(BASE_DIR, "seller_cache.json")
 CONFIG = {
     "global_defaults": {
         "min_seller_feedback": 95,
-        "min_seller_transactions": 10,
+        "min_seller_transactions": 25,
         "cooldown_hours": 24,
     },
     "alerts": [
@@ -187,33 +185,45 @@ def match_tier(item: dict, tiers: list) -> dict | None:
             return tier
     return None
 
-# ── SMS alert ─────────────────────────────────────────────────────────────────
-twilio_client = TwilioClient(TWILIO_SID, TWILIO_TOKEN)
+# ── Email alert ───────────────────────────────────────────────────────────────
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-def send_sms(message: str):
+def send_alert(subject: str, body: str):
     try:
-        msg = twilio_client.messages.create(
-            body=message,
-            from_=TWILIO_FROM,
-            to=ALERT_TO_NUMBER,
-        )
-        log.info("SMS sent: %s", msg.sid)
+        msg = MIMEMultipart()
+        msg["From"]    = GMAIL_ADDRESS
+        msg["To"]      = ALERT_TO_EMAIL
+        msg["Subject"] = subject
+        msg.attach(MIMEText(body, "plain"))
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
+            server.sendmail(GMAIL_ADDRESS, ALERT_TO_EMAIL, msg.as_string())
+        log.info("Email sent: %s", subject)
     except Exception as e:
-        log.error("SMS failed: %s", e)
+        log.error("Email failed: %s", e)
 
-def build_sms(item: dict, tier: dict, alert_cfg: dict) -> str:
-    title  = item.get("title", "Unknown item")[:60]
+def build_alert(item: dict, tier: dict, alert_cfg: dict) -> tuple:
+    title  = item.get("title", "Unknown item")
     price  = item.get("price", {}).get("value", "?")
     url    = item.get("itemWebUrl", "")
     opts   = ", ".join(item.get("buyingOptions", []))
     label  = tier.get("label", "Match")
-    return (
-        f"eBay Alert [{label}]\n"
-        f"{title}\n"
-        f"${price} — {opts}\n"
-        f"Search: {alert_cfg['keywords']}\n"
-        f"{url}"
+    seller = item.get("seller", {})
+    feedback = seller.get("feedbackPercentage", "?")
+    transactions = seller.get("feedbackScore", "?")
+    subject = f"eBay Alert [{label}] ${price} — {title[:50]}"
+    body = (
+        f"Alert: {label}\n"
+        f"Search: {alert_cfg['keywords']}\n\n"
+        f"Title: {title}\n"
+        f"Price: ${price}\n"
+        f"Buying options: {opts}\n"
+        f"Seller feedback: {feedback}% ({transactions} transactions)\n\n"
+        f"View listing:\n{url}"
     )
+    return subject, body
 
 # ── Main scan loop ────────────────────────────────────────────────────────────
 def run_scan(config: dict, seen: dict):
@@ -263,12 +273,12 @@ def run_scan(config: dict, seen: dict):
 
             mark_seen(seen, item_id)
             matched += 1
-            msg = build_sms(item, tier, alert_cfg)
+            subject, body = build_alert(item, tier, alert_cfg)
             log.info("  MATCH [%s] $%s — %s",
                      tier["label"],
                      item.get("price", {}).get("value", "?"),
                      title[:50])
-            send_sms(msg)
+            send_alert(subject, body)
 
         log.info("  → %d new matches alerted", matched)
 
