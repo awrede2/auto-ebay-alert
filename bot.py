@@ -15,8 +15,8 @@ log = logging.getLogger(__name__)
 # ── Environment variables (set in Railway) ────────────────────────────────────
 EBAY_CLIENT_ID     = os.environ["EBAY_CLIENT_ID"]
 EBAY_CLIENT_SECRET = os.environ["EBAY_CLIENT_SECRET"]
-GMAIL_ADDRESS      = os.environ["GMAIL_ADDRESS"]       # your gmail address
-GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]   # 16-char app password
+SENDGRID_API_KEY   = os.environ["SENDGRID_API_KEY"]     # SendGrid API key
+ALERT_FROM_EMAIL   = os.environ["ALERT_FROM_EMAIL"]     # verified sender email
 ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]       # email to receive alerts
 SCAN_INTERVAL_SEC  = int(os.environ.get("SCAN_INTERVAL_SECONDS", 300))  # default 5 min
 
@@ -186,21 +186,26 @@ def match_tier(item: dict, tiers: list) -> dict | None:
     return None
 
 # ── Email alert ───────────────────────────────────────────────────────────────
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
 def send_alert(subject: str, body: str):
     try:
-        msg = MIMEMultipart()
-        msg["From"]    = GMAIL_ADDRESS
-        msg["To"]      = ALERT_TO_EMAIL
-        msg["Subject"] = subject
-        msg.attach(MIMEText(body, "plain"))
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
-            server.sendmail(GMAIL_ADDRESS, ALERT_TO_EMAIL, msg.as_string())
-        log.info("Email sent: %s", subject)
+        resp = requests.post(
+            "https://api.sendgrid.com/v3/mail/send",
+            headers={
+                "Authorization": f"Bearer {SENDGRID_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "personalizations": [{"to": [{"email": ALERT_TO_EMAIL}]}],
+                "from": {"email": ALERT_FROM_EMAIL},
+                "subject": subject,
+                "content": [{"type": "text/plain", "value": body}],
+            },
+            timeout=15,
+        )
+        if resp.status_code == 202:
+            log.info("Email sent: %s", subject)
+        else:
+            log.error("Email failed: %s %s", resp.status_code, resp.text)
     except Exception as e:
         log.error("Email failed: %s", e)
 
