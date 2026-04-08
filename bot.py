@@ -36,7 +36,7 @@ CONFIG = {
                 {
             "keywords": "1999 Charizard 4 PSA 9",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king"],
             "tiers": [
                 {"label": "Steal",        "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 1500, "max_price": 2750, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -45,7 +45,7 @@ CONFIG = {
         {
             "keywords": "1999 Charizard 4 PSA 8",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king"],
             "tiers": [
                 {"label": "Steal",        "min_price": 600, "max_price": 1100, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 600, "max_price": 1250, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -54,7 +54,7 @@ CONFIG = {
                 {
             "keywords": "1999 Charizard 4 PSA 7.5",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king"],
             "tiers": [
                 {"label": "Steal",        "min_price": 500, "max_price": 800, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 500, "max_price": 1000, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -63,7 +63,7 @@ CONFIG = {
         {
             "keywords": "1999 Charizard 4 PSA 7",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king"],
             "tiers": [
                 {"label": "Steal",        "min_price": 500, "max_price": 600, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 500, "max_price": 698, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -72,7 +72,7 @@ CONFIG = {
                         {
             "keywords": "1986 Michael Jordan Fleer 57 PSA 3",
             "condition": "any",
-            "exclude_keywords": [],
+            "exclude_keywords": ["replica", "fake", "reproduction", "sticker"],
             "tiers": [
                 {"label": "Steal",        "min_price": 3000, "max_price": 4000, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 3000, "max_price": 4400, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
