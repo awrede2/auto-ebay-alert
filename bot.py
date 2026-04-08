@@ -18,7 +18,7 @@ EBAY_CLIENT_SECRET = os.environ["EBAY_CLIENT_SECRET"]
 SENDGRID_API_KEY   = os.environ["SENDGRID_API_KEY"]     # SendGrid API key
 ALERT_FROM_EMAIL   = os.environ["ALERT_FROM_EMAIL"]     # verified sender email
 ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]       # email to receive alerts
-SCAN_INTERVAL_SEC  = int(os.environ.get("SCAN_INTERVAL_SECONDS", 300))  # default 5 min
+SCAN_INTERVAL_SEC  = int(os.environ.get("SCAN_INTERVAL_SECONDS", 300))  # 5 min default
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
