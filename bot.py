@@ -31,7 +31,7 @@ SELLERS_FILE = os.path.join(BASE_DIR, "seller_cache.json")
 CONFIG = {
     "global_defaults": {
         "min_seller_feedback": 95,
-        "min_seller_transactions": 25,
+        "min_seller_transactions": 10,
         "cooldown_hours": 24,
     },
     "alerts": [
