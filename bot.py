@@ -29,17 +29,35 @@ SELLERS_FILE = os.path.join(BASE_DIR, "seller_cache.json")
 CONFIG = {
     "global_defaults": {
         "min_seller_feedback": 95,
-        "min_seller_transactions": 25,
+        "min_seller_transactions": 15,
         "cooldown_hours": 24,
     },
     "alerts": [
+                {
+            "keywords": "1999 Charizard 4 PSA 9",
+            "condition": "any",
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett"],
+            "tiers": [
+                {"label": "Steal",        "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 1500, "max_price": 2750, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
         {
             "keywords": "1999 Charizard 4 PSA 8",
             "condition": "any",
             "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett"],
             "tiers": [
                 {"label": "Steal",        "min_price": 600, "max_price": 1100, "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 600, "max_price": 1300, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Worth an offer","min_price": 600, "max_price": 1250, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+                {
+            "keywords": "1999 Charizard 4 PSA 7.5",
+            "condition": "any",
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett"],
+            "tiers": [
+                {"label": "Steal",        "min_price": 500, "max_price": 800, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 500, "max_price": 1000, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -47,8 +65,41 @@ CONFIG = {
             "condition": "any",
             "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett"],
             "tiers": [
-                {"label": "Steal",        "min_price": 500, "max_price": 650, "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 500, "max_price": 700, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Steal",        "min_price": 500, "max_price": 600, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 500, "max_price": 698, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+                        {
+            "keywords": "1986 Michael Jordan Fleer 57 PSA 3",
+            "condition": "any",
+            "exclude_keywords": [],
+            "tiers": [
+                {"label": "Steal",        "min_price": 3000, "max_price": 4000, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 3000, "max_price": 4400, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+        {
+            "keywords": "1921 w551 PSA 8",
+            "condition": "any",
+            "exclude_keywords": [],
+            "tiers": [
+                {"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+                {
+            "keywords": "1921 w551 PSA 9",
+            "condition": "any",
+            "exclude_keywords": [],
+            "tiers": [
+                {"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+                        {
+            "keywords": "1921 w551 uncut",
+            "condition": "any",
+            "exclude_keywords": [],
+            "tiers": [
+                {"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
     ],
