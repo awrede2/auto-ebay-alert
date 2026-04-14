@@ -30,7 +30,7 @@ CONFIG = {
     "global_defaults": {
         "min_seller_feedback": 95,
         "min_seller_transactions": 15,
-        "cooldown_hours": 24,
+        "cooldown_hours": 2400,
     },
     "alerts": [
                 {
