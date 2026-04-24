@@ -36,7 +36,7 @@ CONFIG = {
                 {
             "keywords": "1999 Charizard 4 PSA 9",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
             "tiers": [
                 {"label": "Steal",        "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 1500, "max_price": 2750, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -97,7 +97,7 @@ CONFIG = {
                         {
             "keywords": "1921 w551 uncut",
             "condition": "any",
-            "exclude_keywords": ["Boxing", "Movie"],
+            "exclude_keywords": ["Boxing", "Movie", "Reprint"],
             "tiers": [
                 {"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
