@@ -69,6 +69,60 @@ CONFIG = {
                 {"label": "Worth an offer","min_price": 500, "max_price": 698, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
+                {
+            "keywords": "1999 Blastoise 2 PSA 7",
+            "condition": "any",
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "tiers": [
+                {"label": "Steal",        "min_price": 100, "max_price": 175, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 100, "max_price": 220, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+                        {
+            "keywords": "1999 Blastoise 2 PSA 8",
+            "condition": "any",
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "tiers": [
+                {"label": "Steal",        "min_price": 100, "max_price": 300, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 100, "max_price": 400, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+                        {
+            "keywords": "1999 Blastoise 2 PSA 9",
+            "condition": "any",
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "tiers": [
+                {"label": "Steal",        "min_price": 300, "max_price": 850, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 300, "max_price": 950, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+                        {
+            "keywords": "1999 Venusaur 2 PSA 7",
+            "condition": "any",
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "tiers": [
+                {"label": "Steal",        "min_price": 75, "max_price": 150, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 75, "max_price": 200, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+                        {
+            "keywords": "1999 Venusaur 2 PSA 8",
+            "condition": "any",
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "tiers": [
+                {"label": "Steal",        "min_price": 100, "max_price": 248, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 100, "max_price": 300, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+                        {
+            "keywords": "1999 Venusaur 2 PSA 9",
+            "condition": "any",
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "tiers": [
+                {"label": "Steal",        "min_price": 350, "max_price": 500, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 350, "max_price": 550, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
                         {
             "keywords": "1986 Michael Jordan Fleer 57 PSA 3",
             "condition": "any",
