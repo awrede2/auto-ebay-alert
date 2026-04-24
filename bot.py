@@ -36,7 +36,7 @@ CONFIG = {
                 {
             "keywords": "1999 Charizard 4 PSA 9",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Portuguese", "Spanish", "French", "German", "Italian", "Japanese", "Korean", "Chinese"],
             "tiers": [
                 {"label": "Steal",        "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 1500, "max_price": 2750, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -45,7 +45,7 @@ CONFIG = {
         {
             "keywords": "1999 Charizard 4 PSA 8",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Portuguese", "Spanish", "French", "German", "Italian", "Japanese", "Korean", "Chinese"],
             "tiers": [
                 {"label": "Steal",        "min_price": 600, "max_price": 1100, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 600, "max_price": 1250, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -54,7 +54,7 @@ CONFIG = {
                 {
             "keywords": "1999 Charizard 4 PSA 7.5",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Portuguese", "Spanish", "French", "German", "Italian", "Japanese", "Korean", "Chinese"],
             "tiers": [
                 {"label": "Steal",        "min_price": 500, "max_price": 800, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 500, "max_price": 1000, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -63,7 +63,7 @@ CONFIG = {
         {
             "keywords": "1999 Charizard 4 PSA 7",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Portuguese", "Spanish", "French", "German", "Italian", "Japanese", "Korean", "Chinese"],
             "tiers": [
                 {"label": "Steal",        "min_price": 500, "max_price": 600, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 500, "max_price": 698, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -72,7 +72,7 @@ CONFIG = {
                 {
             "keywords": "1999 Blastoise 2 PSA 7",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Portuguese", "Spanish", "French", "German", "Italian", "Japanese", "Korean", "Chinese"],
             "tiers": [
                 {"label": "Steal",        "min_price": 100, "max_price": 175, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 100, "max_price": 220, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -81,7 +81,7 @@ CONFIG = {
                         {
             "keywords": "1999 Blastoise 2 PSA 8",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Portuguese", "Spanish", "French", "German", "Italian", "Japanese", "Korean", "Chinese"],
             "tiers": [
                 {"label": "Steal",        "min_price": 100, "max_price": 300, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 100, "max_price": 400, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -90,7 +90,7 @@ CONFIG = {
                         {
             "keywords": "1999 Blastoise 2 PSA 9",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Portuguese", "Spanish", "French", "German", "Italian", "Japanese", "Korean", "Chinese"],
             "tiers": [
                 {"label": "Steal",        "min_price": 300, "max_price": 850, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 300, "max_price": 950, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -99,7 +99,7 @@ CONFIG = {
                         {
             "keywords": "1999 Venusaur 2 PSA 7",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Portuguese", "Spanish", "French", "German", "Italian", "Japanese", "Korean", "Chinese"],
             "tiers": [
                 {"label": "Steal",        "min_price": 75, "max_price": 150, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 75, "max_price": 200, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -108,7 +108,7 @@ CONFIG = {
                         {
             "keywords": "1999 Venusaur 2 PSA 8",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Portuguese", "Spanish", "French", "German", "Italian", "Japanese", "Korean", "Chinese"],
             "tiers": [
                 {"label": "Steal",        "min_price": 100, "max_price": 248, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 100, "max_price": 300, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -117,7 +117,7 @@ CONFIG = {
                         {
             "keywords": "1999 Venusaur 2 PSA 9",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000"],
+            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Portuguese", "Spanish", "French", "German", "Italian", "Japanese", "Korean", "Chinese"],
             "tiers": [
                 {"label": "Steal",        "min_price": 350, "max_price": 500, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 350, "max_price": 550, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -153,7 +153,7 @@ CONFIG = {
             "condition": "any",
             "exclude_keywords": ["Boxing", "Movie", "Reprint"],
             "tiers": [
-                {"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "w551 Match", "min_price": 0, "max_price": 89999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
     ],
