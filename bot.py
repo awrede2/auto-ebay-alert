@@ -18,8 +18,17 @@ SENDGRID_API_KEY   = os.environ["SENDGRID_API_KEY"]
 ALERT_FROM_EMAIL   = os.environ["ALERT_FROM_EMAIL"]
 ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]
 
-# ── Seen listings file (committed back to repo after each run) ────────────────
+# ── Seen listings file ────────────────────────────────────────────────────────
 SEEN_FILE = "seen_listings.json"
+
+# ── Shared exclude keywords ───────────────────────────────────────────────────
+POKEMON_EXCLUDES = [
+    "replica", "fake", "reproduction", "topps", "Beckett", "burger king",
+    "2000", "Portuguese", "Spanish", "French", "German", "Italian",
+    "Japanese", "Korean", "Chinese", "Foreign", "Reprint", "Boxing"
+]
+
+W551_EXCLUDES = ["Boxing", "Movie", "Reprint"]
 
 # ── Inline config ─────────────────────────────────────────────────────────────
 CONFIG = {
@@ -32,7 +41,7 @@ CONFIG = {
         {
             "keywords": "1999 Charizard 4 PSA 9",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Boxing", "Reprint", "Portuguese", "Spanish", "French", "German", "Japanese", "Korean", "Chinese", "Foreign"],
+            "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
                 {"label": "Steal",         "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 1500, "max_price": 2750, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -41,7 +50,7 @@ CONFIG = {
         {
             "keywords": "1999 Charizard 4 PSA 8",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Boxing", "Reprint", "Portuguese", "Spanish", "French", "German", "Japanese", "Korean", "Chinese", "Foreign"],
+            "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
                 {"label": "Steal",         "min_price": 600,  "max_price": 1100, "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 600,  "max_price": 1250, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -50,7 +59,7 @@ CONFIG = {
         {
             "keywords": "1999 Charizard 4 PSA 7.5",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Boxing", "Reprint", "Portuguese", "Spanish", "French", "German", "Japanese", "Korean", "Chinese", "Foreign"],
+            "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
                 {"label": "Steal",         "min_price": 500,  "max_price": 800,  "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 500,  "max_price": 1000, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
@@ -59,10 +68,64 @@ CONFIG = {
         {
             "keywords": "1999 Charizard 4 PSA 7",
             "condition": "any",
-            "exclude_keywords": ["replica", "fake", "reproduction", "topps", "Beckett", "burger king", "2000", "Boxing", "Reprint", "Portuguese", "Spanish", "French", "German", "Japanese", "Korean", "Chinese", "Foreign"],
+            "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
                 {"label": "Steal",         "min_price": 500,  "max_price": 600,  "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 500,  "max_price": 698,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+        {
+            "keywords": "1999 Blastoise 2 PSA 7",
+            "condition": "any",
+            "exclude_keywords": POKEMON_EXCLUDES,
+            "tiers": [
+                {"label": "Steal",         "min_price": 100,  "max_price": 175,  "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 100,  "max_price": 220,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+        {
+            "keywords": "1999 Blastoise 2 PSA 8",
+            "condition": "any",
+            "exclude_keywords": POKEMON_EXCLUDES,
+            "tiers": [
+                {"label": "Steal",         "min_price": 100,  "max_price": 300,  "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 100,  "max_price": 400,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+        {
+            "keywords": "1999 Blastoise 2 PSA 9",
+            "condition": "any",
+            "exclude_keywords": POKEMON_EXCLUDES,
+            "tiers": [
+                {"label": "Steal",         "min_price": 300,  "max_price": 850,  "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 300,  "max_price": 950,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+        {
+            "keywords": "1999 Venusaur 2 PSA 7",
+            "condition": "any",
+            "exclude_keywords": POKEMON_EXCLUDES,
+            "tiers": [
+                {"label": "Steal",         "min_price": 75,   "max_price": 150,  "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 75,   "max_price": 200,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+        {
+            "keywords": "1999 Venusaur 2 PSA 8",
+            "condition": "any",
+            "exclude_keywords": POKEMON_EXCLUDES,
+            "tiers": [
+                {"label": "Steal",         "min_price": 100,  "max_price": 248,  "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 100,  "max_price": 300,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+            ],
+        },
+        {
+            "keywords": "1999 Venusaur 2 PSA 9",
+            "condition": "any",
+            "exclude_keywords": POKEMON_EXCLUDES,
+            "tiers": [
+                {"label": "Steal",         "min_price": 350,  "max_price": 500,  "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 350,  "max_price": 550,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -77,7 +140,7 @@ CONFIG = {
         {
             "keywords": "1921 w551 PSA 8",
             "condition": "any",
-            "exclude_keywords": [],
+            "exclude_keywords": W551_EXCLUDES,
             "tiers": [
                 {"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
@@ -85,7 +148,7 @@ CONFIG = {
         {
             "keywords": "1921 w551 PSA 9",
             "condition": "any",
-            "exclude_keywords": [],
+            "exclude_keywords": W551_EXCLUDES,
             "tiers": [
                 {"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
@@ -93,9 +156,9 @@ CONFIG = {
         {
             "keywords": "1921 w551 uncut",
             "condition": "any",
-            "exclude_keywords": [],
+            "exclude_keywords": W551_EXCLUDES,
             "tiers": [
-                {"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "w551 Match", "min_price": 0, "max_price": 89999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
     ],
@@ -247,11 +310,11 @@ def main():
     total_matched    = 0
 
     for alert_cfg in CONFIG["alerts"]:
-        keywords     = alert_cfg["keywords"]
-        condition    = alert_cfg.get("condition", "any")
+        keywords       = alert_cfg["keywords"]
+        condition      = alert_cfg.get("condition", "any")
         required_grade = alert_cfg.get("required_grade")
-        exclude_kws  = alert_cfg.get("exclude_keywords", [])
-        tiers        = alert_cfg.get("tiers", [])
+        exclude_kws    = alert_cfg.get("exclude_keywords", [])
+        tiers          = alert_cfg.get("tiers", [])
 
         if not tiers:
             continue
