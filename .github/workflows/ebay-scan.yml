@@ -2,7 +2,7 @@ name: eBay Alert Scan
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/30 * * * *'
   push:
     branches:
       - main
