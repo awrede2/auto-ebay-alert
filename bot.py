@@ -44,7 +44,7 @@ CONFIG = {
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
                 {"label": "Steal",         "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 1500, "max_price": 2750, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Worth an offer","min_price": 1500, "max_price": 2990, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -98,7 +98,7 @@ CONFIG = {
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
                 {"label": "Steal",         "min_price": 300,  "max_price": 850,  "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 300,  "max_price": 950,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Worth an offer","min_price": 300,  "max_price": 990,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -125,7 +125,7 @@ CONFIG = {
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
                 {"label": "Steal",         "min_price": 350,  "max_price": 500,  "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 350,  "max_price": 550,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Worth an offer","min_price": 350,  "max_price": 590,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
