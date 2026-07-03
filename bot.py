@@ -44,7 +44,7 @@ CONFIG = {
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
                 {"label": "Steal",         "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 1500, "max_price": 4990, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Worth an offer","min_price": 1500, "max_price": 2990, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
