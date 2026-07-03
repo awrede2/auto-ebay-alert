@@ -25,7 +25,7 @@ SEEN_FILE = "seen_listings.json"
 POKEMON_EXCLUDES = [
     "replica", "fake", "reproduction", "topps", "Beckett", "burger king",
     "2000", "Portuguese", "Spanish", "French", "German", "Italian",
-    "Japanese", "Korean", "Chinese", "Foreign", "Reprint", "Boxing", "PCG", "Blaine's", "AGS"
+    "Japanese", "Korean", "Chinese", "Foreign", "Reprint", "Boxing"
 ]
 
 W551_EXCLUDES = ["Boxing", "Movie", "Reprint"]
@@ -35,7 +35,7 @@ CONFIG = {
     "global_defaults": {
         "min_seller_feedback": 95,
         "min_seller_transactions": 15,
-        "cooldown_hours": 1500,
+        "cooldown_hours": 72,
     },
     "alerts": [
         {
@@ -43,8 +43,8 @@ CONFIG = {
             "condition": "any",
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
-                {"label": "Steal",         "min_price": 1500, "max_price": 2750, "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 1500, "max_price": 5000, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Steal",         "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 1500, "max_price": 2750, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -52,8 +52,8 @@ CONFIG = {
             "condition": "any",
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
-                {"label": "Steal",         "min_price": 600,  "max_price": 1150, "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 600,  "max_price": 1300, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Steal",         "min_price": 600,  "max_price": 1100, "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 600,  "max_price": 1250, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -80,7 +80,7 @@ CONFIG = {
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
                 {"label": "Steal",         "min_price": 100,  "max_price": 175,  "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 100,  "max_price": 250,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Worth an offer","min_price": 100,  "max_price": 220,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -88,7 +88,7 @@ CONFIG = {
             "condition": "any",
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
-                {"label": "Steal",         "min_price": 100,  "max_price": 330,  "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Steal",         "min_price": 100,  "max_price": 300,  "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 100,  "max_price": 400,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
@@ -98,7 +98,7 @@ CONFIG = {
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
                 {"label": "Steal",         "min_price": 300,  "max_price": 850,  "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 300,  "max_price": 1000,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Worth an offer","min_price": 300,  "max_price": 950,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -106,8 +106,8 @@ CONFIG = {
             "condition": "any",
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
-                {"label": "Steal",         "min_price": 75,   "max_price": 175,  "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 75,   "max_price": 225,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Steal",         "min_price": 75,   "max_price": 150,  "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 75,   "max_price": 200,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -115,7 +115,7 @@ CONFIG = {
             "condition": "any",
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
-                {"label": "Steal",         "min_price": 100,  "max_price": 250,  "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Steal",         "min_price": 100,  "max_price": 248,  "buying_options": ["BUY_IT_NOW"]},
                 {"label": "Worth an offer","min_price": 100,  "max_price": 300,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
@@ -124,8 +124,8 @@ CONFIG = {
             "condition": "any",
             "exclude_keywords": POKEMON_EXCLUDES,
             "tiers": [
-                {"label": "Steal",         "min_price": 350,  "max_price": 550,  "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 350,  "max_price": 650,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Steal",         "min_price": 350,  "max_price": 500,  "buying_options": ["BUY_IT_NOW"]},
+                {"label": "Worth an offer","min_price": 350,  "max_price": 550,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -134,7 +134,7 @@ CONFIG = {
             "exclude_keywords": ["replica", "fake", "reproduction", "sticker"],
             "tiers": [
                 {"label": "Steal",         "min_price": 3000, "max_price": 4000, "buying_options": ["BUY_IT_NOW"]},
-                {"label": "Worth an offer","min_price": 3000, "max_price": 4600, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
+                {"label": "Worth an offer","min_price": 3000, "max_price": 4400, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
             ],
         },
         {
@@ -263,17 +263,17 @@ def match_tier(item, tiers):
 # ── Email ─────────────────────────────────────────────────────────────────────
 def send_alert(subject, body):
     resp = requests.post(
-        "https://api.sendgrid.com/v3/mail/send",
+        "https://api.resend.com/emails",
         headers={"Authorization": f"Bearer {SENDGRID_API_KEY}", "Content-Type": "application/json"},
         json={
-            "personalizations": [{"to": [{"email": ALERT_TO_EMAIL}]}],
-            "from": {"email": ALERT_FROM_EMAIL},
+            "from": ALERT_FROM_EMAIL,
+            "to": [ALERT_TO_EMAIL],
             "subject": subject,
-            "content": [{"type": "text/plain", "value": body}],
+            "text": body,
         },
         timeout=15,
     )
-    if resp.status_code == 202:
+    if resp.status_code == 200:
         log.info("Email sent: %s", subject)
     else:
         log.error("Email failed: %s %s", resp.status_code, resp.text)
