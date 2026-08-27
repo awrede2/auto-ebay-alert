@@ -25,7 +25,8 @@ SEEN_FILE = "seen_listings.json"
 POKEMON_EXCLUDES = [
     "replica", "fake", "reproduction", "topps", "Beckett", "burger king",
     "2000", "Portuguese", "Spanish", "French", "German", "Italian",
-    "Japanese", "Korean", "Chinese", "Foreign", "Reprint", "Boxing"
+    "Japanese", "Korean", "Chinese", "Foreign", "Reprint", "Boxing",
+    "Base 2", "AGS", "Erika's"
 ]
 
 W551_EXCLUDES = ["Boxing", "Movie", "Reprint"]
