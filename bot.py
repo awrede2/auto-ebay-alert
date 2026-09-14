@@ -581,9 +581,7 @@ def run_broad(token, seen):
         max_price = cfg["max_price"]
         min_grade = cfg["min_grade"]
 
-        keywords = f"{player} PSA graded rookie card"
-        if sport == "Pokemon":
-            keywords = f"{player} PSA holo"
+        keywords = f"{player} PSA"
 
         log.info("Scanning: %s (%s, max $%d, min grade PSA %d)",
                  player, sport, max_price, min_grade)
