@@ -15,224 +15,165 @@ log = logging.getLogger(__name__)
 # ── Environment variables ─────────────────────────────────────────────────────
 EBAY_CLIENT_ID     = os.environ["EBAY_CLIENT_ID"]
 EBAY_CLIENT_SECRET = os.environ["EBAY_CLIENT_SECRET"]
-RESEND_API_KEY     = os.environ["SENDGRID_API_KEY"]   # variable name kept for compatibility
+RESEND_API_KEY     = os.environ["SENDGRID_API_KEY"]
 ALERT_FROM_EMAIL   = os.environ["ALERT_FROM_EMAIL"]
 ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]
-
-# RUN_MODE: "specific" (Layer 1) or "broad" (Layer 2)
-RUN_MODE = os.environ.get("RUN_MODE", "specific")
+RUN_MODE           = os.environ.get("RUN_MODE", "specific")
 
 # ── Global settings ───────────────────────────────────────────────────────────
-MAX_PRICE            = 1000
-DISCOUNT_THRESHOLD   = 0.10    # alert when 25%+ below market
-MIN_SOLD_SAMPLES     = 5       # minimum sold comps to trust the average
-TRIM_PCT             = 0.10    # trim top and bottom 10% for avg calculation
-COOLDOWN_HOURS       = 1500
+DISCOUNT_THRESHOLD = 0.35
+MIN_SOLD_SAMPLES   = 4
+TRIM_PCT           = 0.10
+COOLDOWN_HOURS     = 1500
+SEEN_FILE_SPECIFIC = "seen_listings.json"
+SEEN_FILE_BROAD    = "seen_broad.json"
 
-SEEN_FILE_SPECIFIC   = "seen_listings.json"
-SEEN_FILE_BROAD      = "seen_broad.json"
+# ── Known brands/sets by sport ────────────────────────────────────────────────
+SPORT_BRANDS = {
+    "Basketball": [
+        "Topps Chrome", "Bowman Chrome", "Panini Prizm", "Panini Select",
+        "Panini Mosaic", "Panini Hoops", "Panini Contenders", "Panini Optic",
+        "Panini National Treasures", "Panini Immaculate", "Panini",
+        "Fleer Ultra", "Fleer", "Topps", "Upper Deck", "Bowman",
+        "SkyBox", "Stadium Club", "Hoops",
+    ],
+    "Baseball": [
+        "Topps Chrome", "Bowman Chrome", "Topps Heritage", "Topps Finest",
+        "Topps Allen Ginter", "Topps Gypsy Queen", "Topps Stadium Club",
+        "Topps", "Bowman", "Fleer", "Donruss", "Upper Deck", "Score",
+    ],
+    "Football": [
+        "Panini Prizm", "Panini Select", "Panini Mosaic", "Panini Contenders",
+        "Panini Optic", "Panini National Treasures", "Panini Immaculate",
+        "Panini", "Topps Chrome", "Topps", "Bowman", "Upper Deck",
+        "Fleer", "Donruss", "Score",
+    ],
+    "Pokemon": [
+        "Base Set Unlimited", "Shadowless Base Set", "Base Set 2",
+        "Base Set", "Jungle", "Fossil", "Team Rocket", "Gym Heroes",
+        "Gym Challenge", "Neo Genesis", "Neo Discovery", "Neo Revelation",
+        "Neo Destiny", "Legendary Collection", "Expedition", "Aquapolis",
+        "Skyridge", "Hidden Fates", "Shining Fates", "Champion's Path",
+        "Evolving Skies", "Brilliant Stars", "Silver Tempest", "Crown Zenith",
+    ],
+}
 
 # ── Shared exclude keywords ───────────────────────────────────────────────────
 POKEMON_EXCLUDES = [
     "replica", "fake", "reproduction", "topps", "Beckett", "burger king",
     "2000", "Portuguese", "Spanish", "French", "German", "Italian",
     "Japanese", "Korean", "Chinese", "Foreign", "Reprint", "Boxing",
-    "lot", "bundle", "collection", "x2", "x3", "set of", "Base 2", "AGS", "Erika's"
+    "lot", "bundle", "collection", "x2", "x3", "set of", "Base 2",
+    "AGS", "Erika's",
 ]
-
-W551_EXCLUDES = ["Boxing", "Movie", "Reprint", "lot", "bundle"]
-
+W551_EXCLUDES  = ["Boxing", "Movie", "Reprint", "lot", "bundle"]
 SPORTS_EXCLUDES = [
     "replica", "fake", "reproduction", "lot", "bundle", "collection",
-    "x2", "x3", "set of", "reprint", "damaged", "restored", "trimmed"
+    "x2", "x3", "set of", "reprint", "damaged", "restored", "trimmed",
+]
+LOT_KEYWORDS = [
+    "lot", "bundle", "collection", "x2", "x3", "set of",
+    "reprint", "damaged", "restored", "trimmed",
 ]
 
-# ── Layer 1 — Specific searches ───────────────────────────────────────────────
+# ── Layer 1 specific alerts ───────────────────────────────────────────────────
 SPECIFIC_ALERTS = [
-    {
-        "keywords": "1999 Charizard 4 PSA 9",
-        "condition": "any",
-        "exclude_keywords": POKEMON_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 1500, "max_price": 2990, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1999 Charizard 4 PSA 8",
-        "condition": "any",
-        "exclude_keywords": POKEMON_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 600,  "max_price": 1100, "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 600,  "max_price": 1250, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1999 Charizard 4 PSA 7.5",
-        "condition": "any",
-        "exclude_keywords": POKEMON_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 500,  "max_price": 800,  "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 500,  "max_price": 1000, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1999 Charizard 4 PSA 7",
-        "condition": "any",
-        "exclude_keywords": POKEMON_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 500,  "max_price": 600,  "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 500,  "max_price": 698,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1999 Blastoise 2 PSA 7",
-        "condition": "any",
-        "exclude_keywords": POKEMON_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 100,  "max_price": 165,  "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 100,  "max_price": 210,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1999 Blastoise 2 PSA 8",
-        "condition": "any",
-        "exclude_keywords": POKEMON_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 100,  "max_price": 300,  "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 100,  "max_price": 400,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1999 Blastoise 2 PSA 9",
-        "condition": "any",
-        "exclude_keywords": POKEMON_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 300,  "max_price": 850,  "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 300,  "max_price": 990,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1999 Venusaur 2 PSA 7",
-        "condition": "any",
-        "exclude_keywords": POKEMON_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 75,   "max_price": 150,  "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 75,   "max_price": 200,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1999 Venusaur 2 PSA 8",
-        "condition": "any",
-        "exclude_keywords": POKEMON_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 100,  "max_price": 248,  "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 100,  "max_price": 300,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1999 Venusaur 2 PSA 9",
-        "condition": "any",
-        "exclude_keywords": POKEMON_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 350,  "max_price": 500,  "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 350,  "max_price": 600,  "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1986 Michael Jordan Fleer 57 PSA 3",
-        "condition": "any",
-        "exclude_keywords": SPORTS_EXCLUDES,
-        "tiers": [
-            {"label": "Steal",         "min_price": 3000, "max_price": 4000, "buying_options": ["BUY_IT_NOW"]},
-            {"label": "Worth an offer","min_price": 3000, "max_price": 4400, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1921 w551 PSA 8",
-        "condition": "any",
-        "exclude_keywords": W551_EXCLUDES,
-        "tiers": [
-            {"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1921 w551 PSA 9",
-        "condition": "any",
-        "exclude_keywords": W551_EXCLUDES,
-        "tiers": [
-            {"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
-    {
-        "keywords": "1921 w551 uncut",
-        "condition": "any",
-        "exclude_keywords": W551_EXCLUDES,
-        "tiers": [
-            {"label": "w551 Match", "min_price": 0, "max_price": 89999, "buying_options": ["BUY_IT_NOW", "BEST_OFFER"]},
-        ],
-    },
+    {"keywords": "1999 Charizard 4 PSA 9",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 1500, "max_price": 2990, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1999 Charizard 4 PSA 8",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 600,  "max_price": 1100, "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 600,  "max_price": 1250, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1999 Charizard 4 PSA 7.5", "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 500,  "max_price": 800,  "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 500,  "max_price": 1000, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1999 Charizard 4 PSA 7",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 500,  "max_price": 600,  "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 500,  "max_price": 698,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1999 Blastoise 2 PSA 7",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 100,  "max_price": 165,  "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 100,  "max_price": 210,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1999 Blastoise 2 PSA 8",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 100,  "max_price": 300,  "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 100,  "max_price": 400,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1999 Blastoise 2 PSA 9",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 300,  "max_price": 850,  "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 300,  "max_price": 990,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1999 Venusaur 2 PSA 7",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 75,   "max_price": 150,  "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 75,   "max_price": 200,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1999 Venusaur 2 PSA 8",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 100,  "max_price": 248,  "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 100,  "max_price": 300,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1999 Venusaur 2 PSA 9",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 350,  "max_price": 500,  "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 350,  "max_price": 600,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1986 Michael Jordan Fleer 57 PSA 3", "condition": "any", "exclude_keywords": SPORTS_EXCLUDES,
+     "tiers": [{"label": "Steal",         "min_price": 3000, "max_price": 4000, "buying_options": ["BUY_IT_NOW"]},
+               {"label": "Worth an offer","min_price": 3000, "max_price": 4400, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1921 w551 PSA 8",   "condition": "any", "exclude_keywords": W551_EXCLUDES,
+     "tiers": [{"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1921 w551 PSA 9",   "condition": "any", "exclude_keywords": W551_EXCLUDES,
+     "tiers": [{"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+    {"keywords": "1921 w551 uncut",   "condition": "any", "exclude_keywords": W551_EXCLUDES,
+     "tiers": [{"label": "w551 Match", "min_price": 0, "max_price": 89999,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
 ]
 
-# ── Layer 2 — Broad player searches ──────────────────────────────────────────
+# ── Layer 2 player searches ───────────────────────────────────────────────────
 PLAYER_SEARCHES = [
     # Basketball
-    {"player": "Michael Jordan",           "sport": "Basketball", "max_price": 1000, "min_grade": 7},
-    {"player": "Kobe Bryant",              "sport": "Basketball", "max_price": 1000, "min_grade": 7},
-    {"player": "LeBron James",             "sport": "Basketball", "max_price": 1000, "min_grade": 8},
-    {"player": "Magic Johnson",            "sport": "Basketball", "max_price": 1000, "min_grade": 7},
-    {"player": "Larry Bird",               "sport": "Basketball", "max_price": 1000, "min_grade": 7},
-    {"player": "Shaquille O'Neal",         "sport": "Basketball", "max_price": 1000, "min_grade": 8},
-    {"player": "Charles Barkley",          "sport": "Basketball", "max_price": 1000, "min_grade": 8},
-    {"player": "Hakeem Olajuwon",          "sport": "Basketball", "max_price": 1000, "min_grade": 8},
-    #{"player": "Dirk Nowitzki",            "sport": "Basketball", "max_price": 1000, "min_grade": 8},
-    {"player": "Kevin Durant",             "sport": "Basketball", "max_price": 1000, "min_grade": 8},
-    {"player": "Stephen Curry",            "sport": "Basketball", "max_price": 1000, "min_grade": 8},
-    {"player": "Giannis Antetokounmpo",    "sport": "Basketball", "max_price": 1000, "min_grade": 8},
-    {"player": "Luka Doncic",              "sport": "Basketball", "max_price": 1000, "min_grade": 8},
-   # {"player": "Zion Williamson",          "sport": "Basketball", "max_price": 1000, "min_grade": 9},
-    {"player": "Shai Gilgeous-Alexander",  "sport": "Basketball", "max_price": 1000, "min_grade": 9},
-    {"player": "Nikola Jokic",             "sport": "Basketball", "max_price": 1000, "min_grade": 9},
-    {"player": "Victor Wembanyama",        "sport": "Basketball", "max_price": 1000, "min_grade": 9},
+    {"player": "Michael Jordan",          "sport": "Basketball", "max_price": 1000, "min_grade": 7},
+    {"player": "Kobe Bryant",             "sport": "Basketball", "max_price": 1000, "min_grade": 7},
+    {"player": "LeBron James",            "sport": "Basketball", "max_price": 1000, "min_grade": 8},
+    {"player": "Magic Johnson",           "sport": "Basketball", "max_price": 1000, "min_grade": 7},
+    {"player": "Larry Bird",              "sport": "Basketball", "max_price": 1000, "min_grade": 7},
+    {"player": "Shaquille O'Neal",        "sport": "Basketball", "max_price": 1000, "min_grade": 8},
+    {"player": "Charles Barkley",         "sport": "Basketball", "max_price": 1000, "min_grade": 8},
+    {"player": "Hakeem Olajuwon",         "sport": "Basketball", "max_price": 1000, "min_grade": 8},
+    {"player": "Kevin Durant",            "sport": "Basketball", "max_price": 1000, "min_grade": 8},
+    {"player": "Stephen Curry",           "sport": "Basketball", "max_price": 1000, "min_grade": 8},
+    {"player": "Giannis Antetokounmpo",   "sport": "Basketball", "max_price": 1000, "min_grade": 8},
+    {"player": "Luka Doncic",             "sport": "Basketball", "max_price": 1000, "min_grade": 8},
+    {"player": "Shai Gilgeous-Alexander", "sport": "Basketball", "max_price": 1000, "min_grade": 9},
+    {"player": "Nikola Jokic",            "sport": "Basketball", "max_price": 1000, "min_grade": 9},
+    {"player": "Victor Wembanyama",       "sport": "Basketball", "max_price": 1000, "min_grade": 9},
     # Baseball
-    {"player": "Mickey Mantle",            "sport": "Baseball",   "max_price": 1000, "min_grade": 1},
-    {"player": "Babe Ruth",                "sport": "Baseball",   "max_price": 1000, "min_grade": 1},
-    {"player": "Hank Aaron",               "sport": "Baseball",   "max_price": 1000, "min_grade": 1},
-    {"player": "Willie Mays",              "sport": "Baseball",   "max_price": 1000, "min_grade": 1},
-    {"player": "Roberto Clemente",         "sport": "Baseball",   "max_price": 1000, "min_grade": 1},
-    {"player": "Cal Ripken Jr",            "sport": "Baseball",   "max_price": 1000, "min_grade": 8},
-    {"player": "Ken Griffey Jr",           "sport": "Baseball",   "max_price": 1000, "min_grade": 8},
-    {"player": "Derek Jeter",              "sport": "Baseball",   "max_price": 1000, "min_grade": 8},
-    {"player": "Mike Trout",               "sport": "Baseball",   "max_price": 1000, "min_grade": 9},
-    {"player": "Ronald Acuna",             "sport": "Baseball",   "max_price": 1000, "min_grade": 9},
-    {"player": "Carlos LaGrange",          "sport": "Baseball",   "max_price": 1000, "min_grade": 9},
-    {"player": "Shohei Ohtani",            "sport": "Baseball",   "max_price": 1000, "min_grade": 9},
-    {"player": "Juan Soto",                "sport": "Baseball",   "max_price": 1000, "min_grade": 9},
+    {"player": "Mickey Mantle",           "sport": "Baseball",   "max_price": 1000, "min_grade": 1},
+    {"player": "Babe Ruth",               "sport": "Baseball",   "max_price": 1000, "min_grade": 1},
+    {"player": "Hank Aaron",              "sport": "Baseball",   "max_price": 1000, "min_grade": 1},
+    {"player": "Willie Mays",             "sport": "Baseball",   "max_price": 1000, "min_grade": 1},
+    {"player": "Roberto Clemente",        "sport": "Baseball",   "max_price": 1000, "min_grade": 1},
+    {"player": "Cal Ripken Jr",           "sport": "Baseball",   "max_price": 1000, "min_grade": 8},
+    {"player": "Ken Griffey Jr",          "sport": "Baseball",   "max_price": 1000, "min_grade": 8},
+    {"player": "Derek Jeter",             "sport": "Baseball",   "max_price": 1000, "min_grade": 8},
+    {"player": "Mike Trout",              "sport": "Baseball",   "max_price": 1000, "min_grade": 9},
+    {"player": "Ronald Acuna",            "sport": "Baseball",   "max_price": 1000, "min_grade": 9},
+    {"player": "Shohei Ohtani",           "sport": "Baseball",   "max_price": 1000, "min_grade": 9},
+    {"player": "Juan Soto",               "sport": "Baseball",   "max_price": 1000, "min_grade": 9},
     # Football
-    {"player": "Patrick Mahomes",          "sport": "Football",   "max_price": 1000, "min_grade": 9},
-    {"player": "Joe Burrow",               "sport": "Football",   "max_price": 1000, "min_grade": 9},
-    {"player": "Justin Herbert",           "sport": "Football",   "max_price": 1000, "min_grade": 9},
-    {"player": "Lamar Jackson",            "sport": "Football",   "max_price": 1000, "min_grade": 9},
-    {"player": "Josh Allen",               "sport": "Football",   "max_price": 1000, "min_grade": 9},
-    {"player": "Justin Jefferson",         "sport": "Football",   "max_price": 1000, "min_grade": 9},
-    {"player": "Jayden Daniels",           "sport": "Football",   "max_price": 1000, "min_grade": 9},
-    {"player": "Drake Maye",               "sport": "Football",   "max_price": 1000, "min_grade": 9},
-    {"player": "Tom Brady",                "sport": "Football",   "max_price": 1000, "min_grade": 8},
-    {"player": "Justin Herbert",           "sport": "Football",   "max_price": 1000, "min_grade": 9},
-    {"player": "Bo Nix",                   "sport": "Football",   "max_price": 1000, "min_grade": 9},
-    {"player": "Caleb Williams",           "sport": "Football",   "max_price": 1000, "min_grade": 9},
+    {"player": "Patrick Mahomes",         "sport": "Football",   "max_price": 1000, "min_grade": 9},
+    {"player": "Joe Burrow",              "sport": "Football",   "max_price": 1000, "min_grade": 9},
+    {"player": "Justin Herbert",          "sport": "Football",   "max_price": 1000, "min_grade": 9},
+    {"player": "Lamar Jackson",           "sport": "Football",   "max_price": 1000, "min_grade": 9},
+    {"player": "Josh Allen",              "sport": "Football",   "max_price": 1000, "min_grade": 9},
+    {"player": "Justin Jefferson",        "sport": "Football",   "max_price": 1000, "min_grade": 9},
+    {"player": "Jayden Daniels",          "sport": "Football",   "max_price": 1000, "min_grade": 9},
+    {"player": "Drake Maye",              "sport": "Football",   "max_price": 1000, "min_grade": 9},
+    {"player": "Tom Brady",               "sport": "Football",   "max_price": 1000, "min_grade": 8},
+    {"player": "Bo Nix",                  "sport": "Football",   "max_price": 1000, "min_grade": 9},
+    {"player": "Caleb Williams",          "sport": "Football",   "max_price": 1000, "min_grade": 9},
     # Pokemon
-    {"player": "Charizard",                "sport": "Pokemon",    "max_price": 500,  "min_grade": 7},
-    {"player": "Blastoise",                "sport": "Pokemon",    "max_price": 500,  "min_grade": 7},
-    {"player": "Venusaur",                 "sport": "Pokemon",    "max_price": 500,  "min_grade": 7},
-    {"player": "Pikachu",                  "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
-    {"player": "Mewtwo",                   "sport": "Pokemon",    "max_price": 500,  "min_grade": 7},
-    {"player": "Gengar",                   "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
-    {"player": "Lugia",                    "sport": "Pokemon",    "max_price": 500,  "min_grade": 8},
-    {"player": "Ho-Oh",                    "sport": "Pokemon",    "max_price": 500,  "min_grade": 8},
-    {"player": "Rayquaza",                 "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
-    {"player": "Umbreon",                  "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
-    {"player": "Espeon",                   "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
+    {"player": "Charizard",               "sport": "Pokemon",    "max_price": 500,  "min_grade": 7},
+    {"player": "Blastoise",               "sport": "Pokemon",    "max_price": 500,  "min_grade": 7},
+    {"player": "Venusaur",                "sport": "Pokemon",    "max_price": 500,  "min_grade": 7},
+    {"player": "Pikachu",                 "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
+    {"player": "Mewtwo",                  "sport": "Pokemon",    "max_price": 500,  "min_grade": 7},
+    {"player": "Gengar",                  "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
+    {"player": "Lugia",                   "sport": "Pokemon",    "max_price": 500,  "min_grade": 8},
+    {"player": "Ho-Oh",                   "sport": "Pokemon",    "max_price": 500,  "min_grade": 8},
+    {"player": "Rayquaza",                "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
+    {"player": "Umbreon",                 "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
+    {"player": "Espeon",                  "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
 ]
 
 # ── eBay OAuth ────────────────────────────────────────────────────────────────
@@ -246,7 +187,7 @@ def get_ebay_token():
     resp.raise_for_status()
     return resp.json()["access_token"]
 
-# ── Seen listings ─────────────────────────────────────────────────────────────
+# ── Seen / cooldown ───────────────────────────────────────────────────────────
 def load_seen(path):
     try:
         with open(path) as f:
@@ -269,44 +210,62 @@ def is_on_cooldown(seen, item_id):
 def mark_seen(seen, item_id):
     seen[item_id] = datetime.now(timezone.utc).isoformat()
 
-# ── Grade verification ────────────────────────────────────────────────────────
-PSA_GRADE_PATTERN = re.compile(
-    r'\bPSA\s*(10|[1-9](?:\.5)?)\b', re.IGNORECASE
-)
+# ── Grade extraction ──────────────────────────────────────────────────────────
+PSA_GRADE_PATTERN = re.compile(r'\bPSA\s*(10|[1-9](?:\.5)?)\b', re.IGNORECASE)
 
 def extract_grade_from_keywords(keywords):
-    """Extract the PSA grade we are searching for from the keyword string."""
     m = PSA_GRADE_PATTERN.search(keywords)
     return m.group(1).strip() if m else None
 
-def grade_matches_title(title, required_grade):
-    """
-    Confirm:
-    1. The required grade appears in the title.
-    2. No conflicting PSA grade appears in the title.
-    e.g. searching PSA 8 — reject titles containing PSA 7, PSA 9 etc.
-    """
-    if required_grade is None:
-        return True  # no grade in keywords, skip check
+def extract_grade_from_title(title):
+    matches = PSA_GRADE_PATTERN.findall(title)
+    if len(matches) == 1:
+        return matches[0].strip()
+    return None  # none or multiple grades — skip
 
+def grade_matches_title(title, required_grade):
+    if required_grade is None:
+        return True
     title_lower = title.lower()
     required_lower = required_grade.lower()
-
-    # Must contain the required grade
     if f"psa {required_lower}" not in title_lower and f"psa{required_lower}" not in title_lower:
         return False
-
-    # Must not contain any OTHER PSA grade
     all_grades = PSA_GRADE_PATTERN.findall(title)
     for g in all_grades:
         if g.strip().lower() != required_lower:
-            log.debug("Grade conflict in title: wanted PSA %s, found PSA %s — '%s'",
-                      required_grade, g, title[:60])
             return False
-
     return True
 
-# ── Title / seller filters ────────────────────────────────────────────────────
+# ── Set extractor ─────────────────────────────────────────────────────────────
+YEAR_PATTERN = re.compile(r'\b(19\d{2}|20\d{2})\b')
+
+def extract_set(title, sport):
+    """Extract set identifier from listing title."""
+    title_lower = title.lower()
+    brands = SPORT_BRANDS.get(sport, [])
+
+    if sport == "Pokemon":
+        for brand in sorted(brands, key=len, reverse=True):
+            if brand.lower() in title_lower:
+                return brand
+        return None
+    else:
+        year_match = YEAR_PATTERN.search(title)
+        year = year_match.group(1) if year_match else None
+        matched_brand = None
+        for brand in sorted(brands, key=len, reverse=True):
+            if brand.lower() in title_lower:
+                matched_brand = brand
+                break
+        if year and matched_brand:
+            return f"{year} {matched_brand}"
+        elif matched_brand:
+            return matched_brand
+        elif year:
+            return year
+        return None
+
+# ── Filters ───────────────────────────────────────────────────────────────────
 def title_passes(title, exclude_keywords):
     title_lower = title.lower()
     for kw in (exclude_keywords or []):
@@ -327,7 +286,6 @@ def seller_passes(item, min_feedback=95, min_transactions=15):
         return False
     return int(count) >= min_transactions
 
-# ── Tier matching ─────────────────────────────────────────────────────────────
 def match_tier(item, tiers):
     price = float(item.get("price", {}).get("value", 9999999))
     buying_options = set(item.get("buyingOptions", []))
@@ -342,19 +300,14 @@ def match_tier(item, tiers):
 
 # ── eBay search ───────────────────────────────────────────────────────────────
 CONDITION_MAP = {
-    "new":      "NEW",
-    "like_new": "LIKE_NEW",
-    "used":     "USED_EXCELLENT,USED_GOOD,USED_ACCEPTABLE",
-    "any":      None,
+    "new": "NEW", "like_new": "LIKE_NEW",
+    "used": "USED_EXCELLENT,USED_GOOD,USED_ACCEPTABLE", "any": None,
 }
 
 def search_active(token, keywords, max_price, condition="any"):
     cond = CONDITION_MAP.get(condition)
-    filters = [
-        "buyingOptions:{FIXED_PRICE|BEST_OFFER}",
-        f"price:[..{max_price}]",
-        "priceCurrency:USD",
-    ]
+    filters = [f"buyingOptions:{{FIXED_PRICE|BEST_OFFER}}",
+               f"price:[..{max_price}]", "priceCurrency:USD"]
     if cond:
         filters.append(f"conditions:{{{cond}}}")
     resp = requests.get(
@@ -368,82 +321,75 @@ def search_active(token, keywords, max_price, condition="any"):
     resp.raise_for_status()
     return resp.json().get("itemSummaries", [])
 
-# ── Sold listing market price ─────────────────────────────────────────────────
-LOT_KEYWORDS = ["lot", "bundle", "collection", "x2", "x3", "set of",
-                 "reprint", "damaged", "restored", "trimmed"]
+# ── Market price from sold listings ───────────────────────────────────────────
+def get_market_price(token, player, grade, card_set, max_price):
+    """
+    Get trimmed mean sold price using the eBay Browse API.
+    Matches on player + grade + set for clean comps.
+    """
+    if card_set:
+        sold_keywords = f"{player} PSA {grade} {card_set}"
+    else:
+        sold_keywords = f"{player} PSA {grade}"
 
-def get_market_price(keywords, max_price):
-    """
-    Query eBay Finding API for recently sold listings.
-    Returns trimmed mean price or None if insufficient data.
-    """
     try:
         resp = requests.get(
-            "https://svcs.ebay.com/services/search/FindingService/v1",
+            "https://api.ebay.com/buy/browse/v1/item_summary/search",
             params={
-                "OPERATION-NAME":                "findCompletedItems",
-                "SERVICE-VERSION":               "1.0.0",
-                "SECURITY-APPNAME":              EBAY_CLIENT_ID,
-                "RESPONSE-DATA-FORMAT":          "JSON",
-                "keywords":                      keywords,
-                "itemFilter(0).name":            "SoldItemsOnly",
-                "itemFilter(0).value":           "true",
-                "itemFilter(1).name":            "ListingType",
-                "itemFilter(1).value":           "FixedPrice",
-                "itemFilter(2).name":            "MinPrice",
-                "itemFilter(2).value":           "10",
-                "itemFilter(3).name":            "MaxPrice",
-                "itemFilter(3).value":           str(max_price),
-                "itemFilter(4).name":            "Currency",
-                "itemFilter(4).value":           "USD",
-                "sortOrder":                     "EndTimeSoonest",
-                "paginationInput.entriesPerPage":"25",
+                "q":           sold_keywords,
+                "filter":      f"buyingOptions:{{FIXED_PRICE}},priceCurrency:USD,price:[10..{max_price}]",
+                "sort":        "endTimeSoonest",
+                "limit":       "50",
+                "fieldgroups": "EXTENDED",
+            },
+            headers={
+                "Authorization":           f"Bearer {token}",
+                "X-EBAY-C-MARKETPLACE-ID": "EBAY_US",
             },
             timeout=15,
         )
         resp.raise_for_status()
-        data  = resp.json()
-        items = (
-            data.get("findCompletedItemsResponse", [{}])[0]
-                .get("searchResult", [{}])[0]
-                .get("item", [])
-        )
+        items = resp.json().get("itemSummaries", [])
 
         prices = []
         for item in items:
             try:
-                title = item.get("title", [""])[0].lower() \
-                    if isinstance(item.get("title"), list) \
-                    else str(item.get("title", "")).lower()
+                title = item.get("title", "")
 
-                # Skip lots and outlier listings
-                if any(kw in title for kw in LOT_KEYWORDS):
+                # Skip lots
+                if not title_passes(title, LOT_KEYWORDS):
                     continue
 
-                price = float(
-                    item["sellingStatus"][0]["currentPrice"][0]["__value__"]
-                )
+                # Player first name must appear in title
+                if player.lower().split()[0] not in title.lower():
+                    continue
+
+                # Exactly one grade in title matching our target grade
+                sold_grade = extract_grade_from_title(title)
+                if sold_grade is None or sold_grade.strip() != str(grade).strip():
+                    continue
+
+                price = float(item.get("price", {}).get("value", 0))
                 if 10 < price <= max_price:
                     prices.append(price)
-            except (KeyError, ValueError, IndexError):
+            except (KeyError, ValueError):
                 continue
 
         if len(prices) < MIN_SOLD_SAMPLES:
-            log.info("    Not enough sold comps (%d found, need %d)",
-                     len(prices), MIN_SOLD_SAMPLES)
+            log.info("    Not enough valid comps (%d/%d) for '%s'",
+                     len(prices), MIN_SOLD_SAMPLES, sold_keywords)
             return None
 
-        # Trimmed mean — remove top and bottom TRIM_PCT
         prices.sort()
-        trim = max(1, int(len(prices) * TRIM_PCT))
+        trim    = max(1, int(len(prices) * TRIM_PCT))
         trimmed = prices[trim:-trim] if len(prices) > trim * 2 else prices
-        avg = sum(trimmed) / len(trimmed)
-        log.info("    Market avg: $%.2f (%d comps, trimmed from %d)",
-                 avg, len(trimmed), len(prices))
+        avg     = sum(trimmed) / len(trimmed)
+        log.info("    Market avg $%.2f (%d comps) — '%s'",
+                 avg, len(trimmed), sold_keywords)
         return avg
 
     except Exception as e:
-        log.warning("    Sold listing lookup failed: %s", e)
+        log.warning("    Sold lookup failed for '%s': %s", sold_keywords, e)
         return None
 
 # ── Email ─────────────────────────────────────────────────────────────────────
@@ -452,12 +398,8 @@ def send_alert(subject, body):
         "https://api.resend.com/emails",
         headers={"Authorization": f"Bearer {RESEND_API_KEY}",
                  "Content-Type": "application/json"},
-        json={
-            "from":    ALERT_FROM_EMAIL,
-            "to":      [ALERT_TO_EMAIL],
-            "subject": subject,
-            "text":    body,
-        },
+        json={"from": ALERT_FROM_EMAIL, "to": [ALERT_TO_EMAIL],
+              "subject": subject, "text": body},
         timeout=15,
     )
     if resp.status_code == 200:
@@ -466,115 +408,85 @@ def send_alert(subject, body):
         log.error("Email failed: %s %s", resp.status_code, resp.text)
 
 def build_specific_alert(item, tier, alert_cfg):
-    title  = item.get("title", "Unknown item")
+    title  = item.get("title", "Unknown")
     price  = item.get("price", {}).get("value", "?")
     url    = item.get("itemWebUrl", "")
     opts   = ", ".join(item.get("buyingOptions", []))
     seller = item.get("seller", {})
     subject = f"eBay Alert [{tier['label']}] ${price} — {title[:50]}"
-    body = (
-        f"Alert: {tier['label']}\n"
-        f"Search: {alert_cfg['keywords']}\n\n"
-        f"Title: {title}\n"
-        f"Price: ${price}\n"
-        f"Buying options: {opts}\n"
-        f"Seller: {seller.get('feedbackPercentage','?')}% "
-        f"({seller.get('feedbackScore','?')} transactions)\n\n"
-        f"View listing:\n{url}"
-    )
+    body = (f"Alert: {tier['label']}\nSearch: {alert_cfg['keywords']}\n\n"
+            f"Title: {title}\nPrice: ${price}\nBuying options: {opts}\n"
+            f"Seller: {seller.get('feedbackPercentage','?')}% "
+            f"({seller.get('feedbackScore','?')} transactions)\n\nView listing:\n{url}")
     return subject, body
 
-def build_broad_alert(item, player, sport, price, market_price, discount_pct):
-    title  = item.get("title", "Unknown item")
+def build_broad_alert(item, player, sport, price, market_price, discount_pct, card_set):
+    title  = item.get("title", "Unknown")
     url    = item.get("itemWebUrl", "")
     opts   = ", ".join(item.get("buyingOptions", []))
     seller = item.get("seller", {})
-    subject = (f"🔥 {sport} Deal! {discount_pct:.0f}% Below Market — "
-               f"${price:.2f} {player}")
-    body = (
-        f"UNDERVALUED CARD — {sport}\n"
-        f"Player/Character: {player}\n\n"
-        f"Title: {title}\n"
-        f"Listed price:    ${price:.2f}\n"
-        f"Market average:  ${market_price:.2f}\n"
-        f"Discount:        {discount_pct:.1f}% below market\n"
-        f"Est. profit:     ~${market_price - price:.2f}\n"
-        f"Buying options:  {opts}\n"
-        f"Seller: {seller.get('feedbackPercentage','?')}% "
-        f"({seller.get('feedbackScore','?')} transactions)\n\n"
-        f"View listing:\n{url}"
-    )
+    subject = f"🔥 {sport} {discount_pct:.0f}% Below Market — ${price:.2f} {player}"
+    body = (f"UNDERVALUED CARD — {sport}\n"
+            f"Player: {player}\nSet: {card_set or 'Unknown'}\n\n"
+            f"Title: {title}\n"
+            f"Listed price:   ${price:.2f}\n"
+            f"Market average: ${market_price:.2f}\n"
+            f"Discount:       {discount_pct:.1f}% below market\n"
+            f"Est. profit:    ~${market_price - price:.2f}\n"
+            f"Buying options: {opts}\n"
+            f"Seller: {seller.get('feedbackPercentage','?')}% "
+            f"({seller.get('feedbackScore','?')} transactions)\n\nView listing:\n{url}")
     return subject, body
 
-# ── Layer 1 — Specific searches ───────────────────────────────────────────────
+# ── Layer 1 ───────────────────────────────────────────────────────────────────
 def run_specific(token, seen):
     log.info("=== LAYER 1: Specific searches ===")
     total = 0
-
     for alert_cfg in SPECIFIC_ALERTS:
         keywords    = alert_cfg["keywords"]
         condition   = alert_cfg.get("condition", "any")
         exclude_kws = alert_cfg.get("exclude_keywords", [])
         tiers       = alert_cfg.get("tiers", [])
-
         if not tiers:
             continue
-
-        # Extract expected grade from keywords for verification
         expected_grade = extract_grade_from_keywords(keywords)
         max_price = max(t["max_price"] for t in tiers)
-        log.info("Scanning: '%s' (max $%.2f, grade check: PSA %s)",
-                 keywords, max_price, expected_grade or "none")
-
+        log.info("Scanning: '%s' (max $%.2f)", keywords, max_price)
         try:
             items = search_active(token, keywords, max_price, condition)
         except Exception as e:
             log.error("  Search failed: %s", e)
             continue
-
-        log.info("  → %d results returned", len(items))
+        log.info("  → %d results", len(items))
         matched = 0
-
         for item in items:
             item_id = item.get("itemId", "")
             if is_on_cooldown(seen, item_id):
                 continue
             if not seller_passes(item):
                 continue
-
             title = item.get("title", "")
-
-            # Grade verification — must match, no conflicting grades
             if not grade_matches_title(title, expected_grade):
-                log.debug("  Grade mismatch — skipping: %s", title[:60])
                 continue
-
             if not title_passes(title, exclude_kws):
                 continue
-
             tier = match_tier(item, tiers)
             if not tier:
                 continue
-
             mark_seen(seen, item_id)
             matched += 1
             total += 1
             subject, body = build_specific_alert(item, tier, alert_cfg)
-            log.info("  MATCH [%s] $%s — %s",
-                     tier["label"],
-                     item.get("price", {}).get("value", "?"),
-                     title[:50])
+            log.info("  MATCH [%s] $%s — %s", tier["label"],
+                     item.get("price", {}).get("value", "?"), title[:50])
             send_alert(subject, body)
-
-        log.info("  → %d new matches alerted", matched)
-
+        log.info("  → %d new matches", matched)
     return total
 
-# ── Layer 2 — Broad player searches ──────────────────────────────────────────
+# ── Layer 2 ───────────────────────────────────────────────────────────────────
 def run_broad(token, seen):
     log.info("=== LAYER 2: Broad player searches ===")
     total = 0
-
     for cfg in PLAYER_SEARCHES:
         player    = cfg["player"]
         sport     = cfg["sport"]
@@ -582,57 +494,47 @@ def run_broad(token, seen):
         min_grade = cfg["min_grade"]
 
         keywords = f"{player} PSA"
-
-        log.info("Scanning: %s (%s, max $%d, min grade PSA %d)",
+        log.info("Scanning: %s (%s, max $%d, min PSA %d)",
                  player, sport, max_price, min_grade)
-
         try:
             items = search_active(token, keywords, max_price)
         except Exception as e:
             log.error("  Search failed: %s", e)
             continue
-
-        log.info("  → %d results returned", len(items))
+        log.info("  → %d results", len(items))
         matched = 0
-
         for item in items:
             item_id = item.get("itemId", "")
             if is_on_cooldown(seen, item_id):
                 continue
             if not seller_passes(item):
                 continue
-
             title = item.get("title", "")
-
-            # Skip lots and junk
             if not title_passes(title, LOT_KEYWORDS):
                 continue
 
-            # Extract grade from title
-            grade_matches = PSA_GRADE_PATTERN.findall(title)
-            if not grade_matches:
-                continue  # no PSA grade in title, skip
-
-            # Must have exactly one grade in the title
-            if len(grade_matches) > 1:
-                log.debug("  Multiple grades in title, skipping: %s", title[:60])
+            # Extract exactly one grade from title
+            grade = extract_grade_from_title(title)
+            if grade is None:
+                continue
+            try:
+                if float(grade) < min_grade:
+                    continue
+            except ValueError:
                 continue
 
-            grade_num = float(grade_matches[0].replace(" ", ""))
-            if grade_num < min_grade:
-                continue  # below minimum grade threshold
+            # Extract set from title
+            card_set = extract_set(title, sport)
 
             price = float(item.get("price", {}).get("value", 0))
             if price <= 0:
                 continue
 
-            # Get market price from sold listings
-            sold_keywords = f"{player} PSA {int(grade_num)}"
-            market_price  = get_market_price(sold_keywords, max_price)
+            # Get market price — matched on player + grade + set
+            market_price = get_market_price(token, player, grade, card_set, max_price)
             if market_price is None:
                 continue
 
-            # Check discount threshold
             discount_pct = ((market_price - price) / market_price) * 100
             if discount_pct < DISCOUNT_THRESHOLD * 100:
                 continue
@@ -641,14 +543,12 @@ def run_broad(token, seen):
             matched += 1
             total += 1
             subject, body = build_broad_alert(
-                item, player, sport, price, market_price, discount_pct
+                item, player, sport, price, market_price, discount_pct, card_set
             )
-            log.info("  MATCH! $%.2f vs market $%.2f (%.1f%% off) — %s",
+            log.info("  MATCH! $%.2f vs $%.2f (%.1f%% off) — %s",
                      price, market_price, discount_pct, title[:50])
             send_alert(subject, body)
-
-        log.info("  → %d new matches alerted", matched)
-
+        log.info("  → %d new matches", matched)
     return total
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -656,7 +556,6 @@ def main():
     log.info("eBay Alert Bot starting — mode: %s", RUN_MODE)
     token = get_ebay_token()
     log.info("eBay token acquired")
-
     if RUN_MODE == "specific":
         seen = load_seen(SEEN_FILE_SPECIFIC)
         total = run_specific(token, seen)
@@ -668,8 +567,7 @@ def main():
     else:
         log.error("Unknown RUN_MODE: %s", RUN_MODE)
         return
-
-    log.info("Done. Total matches this run: %d", total)
+    log.info("Done. Total matches: %d", total)
 
 if __name__ == "__main__":
     main()
