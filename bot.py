@@ -24,7 +24,7 @@ RUN_MODE = os.environ.get("RUN_MODE", "specific")
 
 # ── Global settings ───────────────────────────────────────────────────────────
 MAX_PRICE            = 1000
-DISCOUNT_THRESHOLD   = 0.25    # alert when 25%+ below market
+DISCOUNT_THRESHOLD   = 0.30    # alert when 25%+ below market
 MIN_SOLD_SAMPLES     = 5       # minimum sold comps to trust the average
 TRIM_PCT             = 0.10    # trim top and bottom 10% for avg calculation
 COOLDOWN_HOURS       = 1500
