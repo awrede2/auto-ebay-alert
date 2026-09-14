@@ -271,7 +271,7 @@ def mark_seen(seen, item_id):
 
 # ── Grade verification ────────────────────────────────────────────────────────
 PSA_GRADE_PATTERN = re.compile(
-    r'\bPSA\s*(10|[1-9](?:\.\5)?)\b', re.IGNORECASE
+    r'\bPSA\s*(10|[1-9](?:\.5)?)\b', re.IGNORECASE
 )
 
 def extract_grade_from_keywords(keywords):
