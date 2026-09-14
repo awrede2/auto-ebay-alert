@@ -1,0 +1,44 @@
+name: eBay Broad Player Scan
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run broad player searches (Layer 2)
+        env:
+          EBAY_CLIENT_ID:     ${{ secrets.EBAY_CLIENT_ID }}
+          EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
+          SENDGRID_API_KEY:   ${{ secrets.SENDGRID_API_KEY }}
+          ALERT_FROM_EMAIL:   ${{ secrets.ALERT_FROM_EMAIL }}
+          ALERT_TO_EMAIL:     ${{ secrets.ALERT_TO_EMAIL }}
+          RUN_MODE:           broad
+        run: python bot.py
+
+      - name: Save seen listings
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen_broad.json
+          git diff --staged --quiet || git commit -m "Update seen listings (broad)"
+          git push
