@@ -547,6 +547,7 @@ def run_broad(token, seen):
         keywords = f"{player} PSA"
         log.info("Scanning: %s (%s, max $%d, min PSA %d)",
                  player, sport, max_price, min_grade)
+        time.sleep(2)  # avoid eBay rate limit
         try:
             items = search_active(token, keywords, max_price)
         except Exception as e:
