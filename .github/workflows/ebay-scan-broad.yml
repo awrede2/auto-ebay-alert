@@ -34,14 +34,14 @@ jobs:
           ALERT_TO_EMAIL:     ${{ secrets.ALERT_TO_EMAIL }}
           RUN_MODE:           broad
         run: python bot.py
-
+        
       - name: Save seen listings
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash
           git pull --rebase origin main
+          git stash pop
           git add seen_broad.json
-          git diff --staged --quiet || git commit -m "Update seen listings (broad)"
-          git push
           git diff --staged --quiet || git commit -m "Update seen listings (broad)"
           git push
