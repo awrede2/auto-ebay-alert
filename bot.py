@@ -4,14 +4,14 @@ import json
 import logging
 import requests
 from datetime import datetime, timedelta, timezone
-
+ 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 log = logging.getLogger(__name__)
-
+ 
 # ── Environment variables ─────────────────────────────────────────────────────
 EBAY_CLIENT_ID     = os.environ["EBAY_CLIENT_ID"]
 EBAY_CLIENT_SECRET = os.environ["EBAY_CLIENT_SECRET"]
@@ -19,15 +19,15 @@ RESEND_API_KEY     = os.environ["SENDGRID_API_KEY"]
 ALERT_FROM_EMAIL   = os.environ["ALERT_FROM_EMAIL"]
 ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]
 RUN_MODE           = os.environ.get("RUN_MODE", "specific")
-
+ 
 # ── Global settings ───────────────────────────────────────────────────────────
 DISCOUNT_THRESHOLD = 0.35
-MIN_SOLD_SAMPLES   = 4
+MIN_SOLD_SAMPLES   = 3
 TRIM_PCT           = 0.10
 COOLDOWN_HOURS     = 1500
 SEEN_FILE_SPECIFIC = "seen_listings.json"
 SEEN_FILE_BROAD    = "seen_broad.json"
-
+ 
 # ── Known brands/sets by sport ────────────────────────────────────────────────
 SPORT_BRANDS = {
     "Basketball": [
@@ -57,7 +57,7 @@ SPORT_BRANDS = {
         "Evolving Skies", "Brilliant Stars", "Silver Tempest", "Crown Zenith",
     ],
 }
-
+ 
 # ── Shared exclude keywords ───────────────────────────────────────────────────
 POKEMON_EXCLUDES = [
     "replica", "fake", "reproduction", "topps", "Beckett", "burger king",
@@ -75,7 +75,7 @@ LOT_KEYWORDS = [
     "lot", "bundle", "collection", "x2", "x3", "set of",
     "reprint", "damaged", "restored", "trimmed",
 ]
-
+ 
 # ── Layer 1 specific alerts ───────────────────────────────────────────────────
 SPECIFIC_ALERTS = [
     {"keywords": "1999 Charizard 4 PSA 9",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
@@ -118,7 +118,7 @@ SPECIFIC_ALERTS = [
     {"keywords": "1921 w551 uncut",   "condition": "any", "exclude_keywords": W551_EXCLUDES,
      "tiers": [{"label": "w551 Match", "min_price": 0, "max_price": 89999,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
 ]
-
+ 
 # ── Layer 2 player searches ───────────────────────────────────────────────────
 PLAYER_SEARCHES = [
     # Basketball
@@ -175,7 +175,7 @@ PLAYER_SEARCHES = [
     {"player": "Umbreon",                 "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
     {"player": "Espeon",                  "sport": "Pokemon",    "max_price": 300,  "min_grade": 8},
 ]
-
+ 
 # ── eBay OAuth ────────────────────────────────────────────────────────────────
 def get_ebay_token():
     resp = requests.post(
@@ -186,7 +186,7 @@ def get_ebay_token():
     )
     resp.raise_for_status()
     return resp.json()["access_token"]
-
+ 
 # ── Seen / cooldown ───────────────────────────────────────────────────────────
 def load_seen(path):
     try:
@@ -194,11 +194,11 @@ def load_seen(path):
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
-
+ 
 def save_seen(seen, path):
     with open(path, "w") as f:
         json.dump(seen, f, indent=2)
-
+ 
 def is_on_cooldown(seen, item_id):
     if item_id not in seen:
         return False
@@ -206,23 +206,23 @@ def is_on_cooldown(seen, item_id):
     if alerted_at.tzinfo is None:
         alerted_at = alerted_at.replace(tzinfo=timezone.utc)
     return datetime.now(timezone.utc) < alerted_at + timedelta(hours=COOLDOWN_HOURS)
-
+ 
 def mark_seen(seen, item_id):
     seen[item_id] = datetime.now(timezone.utc).isoformat()
-
+ 
 # ── Grade extraction ──────────────────────────────────────────────────────────
 PSA_GRADE_PATTERN = re.compile(r'\bPSA\s*(10|[1-9](?:\.5)?)\b', re.IGNORECASE)
-
+ 
 def extract_grade_from_keywords(keywords):
     m = PSA_GRADE_PATTERN.search(keywords)
     return m.group(1).strip() if m else None
-
+ 
 def extract_grade_from_title(title):
     matches = PSA_GRADE_PATTERN.findall(title)
     if len(matches) == 1:
         return matches[0].strip()
     return None  # none or multiple grades — skip
-
+ 
 def grade_matches_title(title, required_grade):
     if required_grade is None:
         return True
@@ -235,15 +235,15 @@ def grade_matches_title(title, required_grade):
         if g.strip().lower() != required_lower:
             return False
     return True
-
+ 
 # ── Set extractor ─────────────────────────────────────────────────────────────
 YEAR_PATTERN = re.compile(r'\b(19\d{2}|20\d{2})\b')
-
+ 
 def extract_set(title, sport):
     """Extract set identifier from listing title."""
     title_lower = title.lower()
     brands = SPORT_BRANDS.get(sport, [])
-
+ 
     if sport == "Pokemon":
         for brand in sorted(brands, key=len, reverse=True):
             if brand.lower() in title_lower:
@@ -264,7 +264,7 @@ def extract_set(title, sport):
         elif year:
             return year
         return None
-
+ 
 # ── Filters ───────────────────────────────────────────────────────────────────
 def title_passes(title, exclude_keywords):
     title_lower = title.lower()
@@ -272,7 +272,7 @@ def title_passes(title, exclude_keywords):
         if kw.lower() in title_lower:
             return False
     return True
-
+ 
 def seller_passes(item, min_feedback=95, min_transactions=15):
     seller = item.get("seller", {})
     score  = seller.get("feedbackPercentage")
@@ -285,7 +285,7 @@ def seller_passes(item, min_feedback=95, min_transactions=15):
     except ValueError:
         return False
     return int(count) >= min_transactions
-
+ 
 def match_tier(item, tiers):
     price = float(item.get("price", {}).get("value", 9999999))
     buying_options = set(item.get("buyingOptions", []))
@@ -297,13 +297,13 @@ def match_tier(item, tiers):
         if set(tier.get("buying_options", ["BUY_IT_NOW"])) & buying_options:
             return tier
     return None
-
+ 
 # ── eBay search ───────────────────────────────────────────────────────────────
 CONDITION_MAP = {
     "new": "NEW", "like_new": "LIKE_NEW",
     "used": "USED_EXCELLENT,USED_GOOD,USED_ACCEPTABLE", "any": None,
 }
-
+ 
 def search_active(token, keywords, max_price, condition="any"):
     cond = CONDITION_MAP.get(condition)
     filters = [f"buyingOptions:{{FIXED_PRICE|BEST_OFFER}}",
@@ -320,78 +320,128 @@ def search_active(token, keywords, max_price, condition="any"):
     )
     resp.raise_for_status()
     return resp.json().get("itemSummaries", [])
-
+ 
 # ── Market price from sold listings ───────────────────────────────────────────
-def get_market_price(token, player, grade, card_set, max_price):
-    """
-    Get trimmed mean sold price using the eBay Browse API.
-    Matches on player + grade + set for clean comps.
-    """
-    if card_set:
-        sold_keywords = f"{player} PSA {grade} {card_set}"
-    else:
-        sold_keywords = f"{player} PSA {grade}"
-
+# ── PriceCharting market price ────────────────────────────────────────────────
+# Grade field mapping: PriceCharting returns prices in cents under these keys
+PC_GRADE_FIELDS = {
+    "1":  "grade-1-price",
+    "2":  "grade-2-price",
+    "3":  "grade-3-price",
+    "4":  "grade-4-price",
+    "5":  "grade-5-price",
+    "6":  "grade-6-price",
+    "7":  "grade-7-price",
+    "8":  "grade-8-price",
+    "9":  "grade-9-price",
+    "9.5":"grade-9-5-price",
+    "10": "grade-10-price",
+}
+ 
+PC_ID_CACHE_FILE = "pc_id_cache.json"
+ 
+def load_pc_cache():
+    try:
+        with open(PC_ID_CACHE_FILE) as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+ 
+def save_pc_cache(cache):
+    with open(PC_ID_CACHE_FILE, "w") as f:
+        json.dump(cache, f, indent=2)
+ 
+PC_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://www.pricecharting.com/",
+}
+ 
+def search_pricecharting_id(player, card_set, pc_cache):
+    """Search PriceCharting for a card and return its product ID. Uses cache."""
+    cache_key = f"{player}|{card_set or 'any'}"
+    if cache_key in pc_cache:
+        return pc_cache[cache_key]
+ 
+    query = f"{player} {card_set}" if card_set else player
     try:
         resp = requests.get(
-            "https://api.ebay.com/buy/browse/v1/item_summary/search",
-            params={
-                "q":           sold_keywords,
-                "filter":      f"buyingOptions:{{FIXED_PRICE}},priceCurrency:USD,price:[10..{max_price}]",
-                "sort":        "endTimeSoonest",
-                "limit":       "50",
-                "fieldgroups": "EXTENDED",
-            },
-            headers={
-                "Authorization":           f"Bearer {token}",
-                "X-EBAY-C-MARKETPLACE-ID": "EBAY_US",
-            },
+            "https://www.pricecharting.com/api/products",
+            params={"q": query, "format": "json"},
+            headers=PC_HEADERS,
             timeout=15,
         )
-        resp.raise_for_status()
-        items = resp.json().get("itemSummaries", [])
-
-        prices = []
-        for item in items:
-            try:
-                title = item.get("title", "")
-
-                # Skip lots
-                if not title_passes(title, LOT_KEYWORDS):
-                    continue
-
-                # Player first name must appear in title
-                if player.lower().split()[0] not in title.lower():
-                    continue
-
-                # Exactly one grade in title matching our target grade
-                sold_grade = extract_grade_from_title(title)
-                if sold_grade is None or sold_grade.strip() != str(grade).strip():
-                    continue
-
-                price = float(item.get("price", {}).get("value", 0))
-                if 10 < price <= max_price:
-                    prices.append(price)
-            except (KeyError, ValueError):
-                continue
-
-        if len(prices) < MIN_SOLD_SAMPLES:
-            log.info("    Not enough valid comps (%d/%d) for '%s'",
-                     len(prices), MIN_SOLD_SAMPLES, sold_keywords)
+        if resp.status_code != 200:
+            log.warning("    PriceCharting search failed: %d", resp.status_code)
             return None
-
-        prices.sort()
-        trim    = max(1, int(len(prices) * TRIM_PCT))
-        trimmed = prices[trim:-trim] if len(prices) > trim * 2 else prices
-        avg     = sum(trimmed) / len(trimmed)
-        log.info("    Market avg $%.2f (%d comps) — '%s'",
-                 avg, len(trimmed), sold_keywords)
-        return avg
-
-    except Exception as e:
-        log.warning("    Sold lookup failed for '%s': %s", sold_keywords, e)
+ 
+        products = resp.json().get("products", [])
+        if not products:
+            log.info("    No PriceCharting results for '%s'", query)
+            return None
+ 
+        # Pick the best match — product whose name contains the player name
+        player_lower = player.lower().split()[0]
+        for product in products[:5]:
+            name = str(product.get("product-name", "")).lower()
+            if player_lower in name:
+                pc_id = product.get("id")
+                if pc_id:
+                    log.info("    PriceCharting match: '%s' (id: %s)", product.get("product-name"), pc_id)
+                    pc_cache[cache_key] = pc_id
+                    save_pc_cache(pc_cache)
+                    return pc_id
+ 
+        log.info("    No PriceCharting match for '%s'", query)
         return None
-
+ 
+    except Exception as e:
+        log.warning("    PriceCharting search error: %s", e)
+        return None
+ 
+def get_market_price(token, player, grade, card_set, max_price, pc_cache):
+    """
+    Get market price from PriceCharting for a specific player + grade + set.
+    Falls back to None if not found.
+    """
+    pc_id = search_pricecharting_id(player, card_set, pc_cache)
+    if not pc_id:
+        return None
+ 
+    try:
+        resp = requests.get(
+            "https://www.pricecharting.com/api/product",
+            params={"id": pc_id},
+            headers=PC_HEADERS,
+            timeout=15,
+        )
+        if resp.status_code != 200:
+            log.warning("    PriceCharting product fetch failed: %d", resp.status_code)
+            return None
+ 
+        data = resp.json()
+ 
+        # Get grade-specific price field
+        grade_str = str(grade).replace(".0", "")
+        field = PC_GRADE_FIELDS.get(grade_str)
+        if not field:
+            log.warning("    No PriceCharting field for grade %s", grade_str)
+            return None
+ 
+        price_cents = data.get(field)
+        if price_cents is None or price_cents == 0:
+            log.info("    No PriceCharting price for grade %s", grade_str)
+            return None
+ 
+        market_price = price_cents / 100.0
+        log.info("    PriceCharting market price: $%.2f (PSA %s)", market_price, grade_str)
+        return market_price
+ 
+    except Exception as e:
+        log.warning("    PriceCharting product error: %s", e)
+        return None
+ 
 # ── Email ─────────────────────────────────────────────────────────────────────
 def send_alert(subject, body):
     resp = requests.post(
@@ -406,7 +456,7 @@ def send_alert(subject, body):
         log.info("Email sent: %s", subject)
     else:
         log.error("Email failed: %s %s", resp.status_code, resp.text)
-
+ 
 def build_specific_alert(item, tier, alert_cfg):
     title  = item.get("title", "Unknown")
     price  = item.get("price", {}).get("value", "?")
@@ -419,7 +469,7 @@ def build_specific_alert(item, tier, alert_cfg):
             f"Seller: {seller.get('feedbackPercentage','?')}% "
             f"({seller.get('feedbackScore','?')} transactions)\n\nView listing:\n{url}")
     return subject, body
-
+ 
 def build_broad_alert(item, player, sport, price, market_price, discount_pct, card_set):
     title  = item.get("title", "Unknown")
     url    = item.get("itemWebUrl", "")
@@ -437,7 +487,7 @@ def build_broad_alert(item, player, sport, price, market_price, discount_pct, ca
             f"Seller: {seller.get('feedbackPercentage','?')}% "
             f"({seller.get('feedbackScore','?')} transactions)\n\nView listing:\n{url}")
     return subject, body
-
+ 
 # ── Layer 1 ───────────────────────────────────────────────────────────────────
 def run_specific(token, seen):
     log.info("=== LAYER 1: Specific searches ===")
@@ -482,17 +532,18 @@ def run_specific(token, seen):
             send_alert(subject, body)
         log.info("  → %d new matches", matched)
     return total
-
+ 
 # ── Layer 2 ───────────────────────────────────────────────────────────────────
 def run_broad(token, seen):
     log.info("=== LAYER 2: Broad player searches ===")
     total = 0
+    pc_cache = load_pc_cache()
     for cfg in PLAYER_SEARCHES:
         player    = cfg["player"]
         sport     = cfg["sport"]
         max_price = cfg["max_price"]
         min_grade = cfg["min_grade"]
-
+ 
         keywords = f"{player} PSA"
         log.info("Scanning: %s (%s, max $%d, min PSA %d)",
                  player, sport, max_price, min_grade)
@@ -512,7 +563,7 @@ def run_broad(token, seen):
             title = item.get("title", "")
             if not title_passes(title, LOT_KEYWORDS):
                 continue
-
+ 
             # Extract exactly one grade from title
             grade = extract_grade_from_title(title)
             if grade is None:
@@ -522,23 +573,23 @@ def run_broad(token, seen):
                     continue
             except ValueError:
                 continue
-
+ 
             # Extract set from title
             card_set = extract_set(title, sport)
-
+ 
             price = float(item.get("price", {}).get("value", 0))
             if price <= 0:
                 continue
-
+ 
             # Get market price — matched on player + grade + set
-            market_price = get_market_price(token, player, grade, card_set, max_price)
+            market_price = get_market_price(token, player, grade, card_set, max_price, pc_cache)
             if market_price is None:
                 continue
-
+ 
             discount_pct = ((market_price - price) / market_price) * 100
             if discount_pct < DISCOUNT_THRESHOLD * 100:
                 continue
-
+ 
             mark_seen(seen, item_id)
             matched += 1
             total += 1
@@ -550,7 +601,7 @@ def run_broad(token, seen):
             send_alert(subject, body)
         log.info("  → %d new matches", matched)
     return total
-
+ 
 # ── Main ──────────────────────────────────────────────────────────────────────
 def main():
     log.info("eBay Alert Bot starting — mode: %s", RUN_MODE)
@@ -564,10 +615,12 @@ def main():
         seen = load_seen(SEEN_FILE_BROAD)
         total = run_broad(token, seen)
         save_seen(seen, SEEN_FILE_BROAD)
+        # pc_id_cache is saved inside run_broad as IDs are discovered
     else:
         log.error("Unknown RUN_MODE: %s", RUN_MODE)
         return
     log.info("Done. Total matches: %d", total)
-
+ 
 if __name__ == "__main__":
     main()
+ 
