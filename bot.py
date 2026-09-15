@@ -311,16 +311,29 @@ def search_active(token, keywords, max_price, condition="any"):
                f"price:[..{max_price}]", "priceCurrency:USD"]
     if cond:
         filters.append(f"conditions:{{{cond}}}")
-    resp = requests.get(
-        "https://api.ebay.com/buy/browse/v1/item_summary/search",
-        params={"q": keywords, "filter": ",".join(filters),
-                "sort": "newlyListed", "limit": "50"},
-        headers={"Authorization": f"Bearer {token}",
-                 "X-EBAY-C-MARKETPLACE-ID": "EBAY_US"},
-        timeout=15,
-    )
-    resp.raise_for_status()
-    return resp.json().get("itemSummaries", [])
+    
+    for attempt in range(3):  # retry up to 3 times
+        try:
+            resp = requests.get(
+                "https://api.ebay.com/buy/browse/v1/item_summary/search",
+                params={"q": keywords, "filter": ",".join(filters),
+                        "sort": "newlyListed", "limit": "50"},
+                headers={"Authorization": f"Bearer {token}",
+                         "X-EBAY-C-MARKETPLACE-ID": "EBAY_US"},
+                timeout=15,
+            )
+            if resp.status_code == 429:
+                wait = 10 * (attempt + 1)  # 10s, 20s, 30s
+                log.warning("  Rate limited, waiting %ds before retry %d...", wait, attempt + 1)
+                time.sleep(wait)
+                continue
+            resp.raise_for_status()
+            return resp.json().get("itemSummaries", [])
+        except Exception as e:
+            if attempt == 2:
+                raise
+            time.sleep(10)
+    return []
  
 # ── Market price from sold listings ───────────────────────────────────────────
 # ── PriceCharting market price ────────────────────────────────────────────────
@@ -548,7 +561,7 @@ def run_broad(token, seen):
         keywords = f"{player} PSA"
         log.info("Scanning: %s (%s, max $%d, min PSA %d)",
                  player, sport, max_price, min_grade)
-        time.sleep(2)  # avoid eBay rate limit
+        time.sleep(5)  # avoid eBay rate limit
         try:
             items = search_active(token, keywords, max_price)
         except Exception as e:
