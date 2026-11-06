@@ -81,37 +81,37 @@ LOT_KEYWORDS = [
 SPECIFIC_ALERTS = [
     {"keywords": "1999 Charizard 4 PSA 9",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 1500, "max_price": 2500, "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 1500, "max_price": 2990, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 1500, "max_price": 2990, "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1999 Charizard 4 PSA 8",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 600,  "max_price": 1100, "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 600,  "max_price": 1250, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 600,  "max_price": 1250, "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1999 Charizard 4 PSA 7.5", "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 500,  "max_price": 800,  "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 500,  "max_price": 1000, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 500,  "max_price": 1000, "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1999 Charizard 4 PSA 7",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 500,  "max_price": 600,  "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 500,  "max_price": 698,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 500,  "max_price": 698,  "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1999 Blastoise 2 PSA 7",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 100,  "max_price": 165,  "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 100,  "max_price": 210,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 100,  "max_price": 210,  "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1999 Blastoise 2 PSA 8",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 100,  "max_price": 300,  "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 100,  "max_price": 400,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 100,  "max_price": 400,  "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1999 Blastoise 2 PSA 9",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 300,  "max_price": 850,  "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 300,  "max_price": 990,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 300,  "max_price": 990,  "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1999 Venusaur 2 PSA 7",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 75,   "max_price": 150,  "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 75,   "max_price": 200,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 75,   "max_price": 200,  "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1999 Venusaur 2 PSA 8",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 100,  "max_price": 248,  "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 100,  "max_price": 300,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 100,  "max_price": 300,  "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1999 Venusaur 2 PSA 9",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 350,  "max_price": 500,  "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 350,  "max_price": 600,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 350,  "max_price": 600,  "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1986 Michael Jordan Fleer 57 PSA 3", "condition": "any", "exclude_keywords": SPORTS_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 3000, "max_price": 4000, "buying_options": ["BUY_IT_NOW"]},
-               {"label": "Worth an offer","min_price": 3000, "max_price": 4400, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
+               {"label": "Worth an offer","min_price": 3000, "max_price": 4400, "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1921 w551 PSA 8",   "condition": "any", "exclude_keywords": W551_EXCLUDES,
      "tiers": [{"label": "w551 Match", "min_price": 0, "max_price": 999999, "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
     {"keywords": "1921 w551 PSA 9",   "condition": "any", "exclude_keywords": W551_EXCLUDES,
@@ -341,6 +341,10 @@ def seller_check(item):
         return True, "⚠ Lower-trust seller: " + ", ".join(warnings)
     return True, None
 
+# eBay's API labels Buy It Now listings "FIXED_PRICE". The configs use the
+# friendlier name BUY_IT_NOW, so translate before comparing.
+BUYING_OPTION_ALIASES = {"BUY_IT_NOW": "FIXED_PRICE"}
+
 def match_tier(item, tiers):
     price = float(item.get("price", {}).get("value", 9999999))
     buying_options = set(item.get("buyingOptions", []))
@@ -349,7 +353,9 @@ def match_tier(item, tiers):
             continue
         if price > float(tier["max_price"]):
             continue
-        if set(tier.get("buying_options", ["BUY_IT_NOW"])) & buying_options:
+        wanted = {BUYING_OPTION_ALIASES.get(o, o)
+                  for o in tier.get("buying_options", ["BUY_IT_NOW"])}
+        if wanted & buying_options:
             return tier
     return None
 
@@ -578,21 +584,45 @@ def run_specific(token, seen):
             continue
         log.info("  → %d results", len(items))
         matched = 0
+        rej = {"cooldown": 0, "seller": 0, "grade": 0, "exclude": 0,
+               "below_min_price": 0, "above_max_price": 0, "buying_option": 0}
+        warned = 0
+        near = None  # cheapest listing that passed every filter except price tier
+        min_tier_price = min(float(t.get("min_price", 0)) for t in tiers)
+        max_tier_price = max(float(t["max_price"]) for t in tiers)
         for item in items:
             item_id = item.get("itemId", "")
             if is_on_cooldown(seen, item_id):
+                rej["cooldown"] += 1
                 continue
             seller_ok, seller_note = seller_check(item)
             if not seller_ok:
+                rej["seller"] += 1
                 continue
             title = item.get("title", "")
             if not grade_matches_title(title, expected_grade):
+                rej["grade"] += 1
                 continue
             if not title_passes(title, exclude_kws):
+                rej["exclude"] += 1
                 continue
             tier = match_tier(item, tiers)
             if not tier:
+                try:
+                    p = float(item.get("price", {}).get("value", 0))
+                except (TypeError, ValueError):
+                    p = 0.0
+                if p < min_tier_price:
+                    rej["below_min_price"] += 1
+                elif p > max_tier_price:
+                    rej["above_max_price"] += 1
+                else:
+                    rej["buying_option"] += 1
+                if near is None or p < near[0]:
+                    near = (p, title[:60])
                 continue
+            if seller_note:
+                warned += 1
             mark_seen(seen, item_id)
             matched += 1
             total += 1
@@ -600,7 +630,10 @@ def run_specific(token, seen):
             log.info("  MATCH [%s] $%s — %s", tier["label"],
                      item.get("price", {}).get("value", "?"), title[:50])
             send_alert(subject, body)
-        log.info("  → %d new matches", matched)
+        log.info("  → %d new matches (%d with seller warning)", matched, warned)
+        log.info("  → rejected: %s", ", ".join(f"{k}={v}" for k, v in rej.items()))
+        if near and matched == 0:
+            log.info("  → closest miss: $%.2f — %s", near[0], near[1])
     return total
 
 # ── Layer 2 ───────────────────────────────────────────────────────────────────
@@ -625,25 +658,33 @@ def run_broad(token, seen):
             continue
         log.info("  → %d results", len(items))
         matched = 0
+        rej = {"cooldown": 0, "seller": 0, "lot_or_junk": 0, "grade_unclear": 0,
+               "below_min_grade": 0, "no_price_comp": 0, "discount_too_small": 0}
         for item in items:
             item_id = item.get("itemId", "")
             if is_on_cooldown(seen, item_id):
+                rej["cooldown"] += 1
                 continue
             seller_ok, seller_note = seller_check(item)
             if not seller_ok:
+                rej["seller"] += 1
                 continue
             title = item.get("title", "")
             if not title_passes(title, LOT_KEYWORDS):
+                rej["lot_or_junk"] += 1
                 continue
 
             # Extract exactly one grade from title
             grade = extract_grade_from_title(title)
             if grade is None:
+                rej["grade_unclear"] += 1
                 continue
             try:
                 if float(grade) < min_grade:
+                    rej["below_min_grade"] += 1
                     continue
             except ValueError:
+                rej["grade_unclear"] += 1
                 continue
 
             # Extract set from title
@@ -656,10 +697,12 @@ def run_broad(token, seen):
             # Get market price — matched on player + grade + set
             market_price = get_market_price(token, player, grade, card_set, max_price, pc_cache)
             if market_price is None:
+                rej["no_price_comp"] += 1
                 continue
 
             discount_pct = ((market_price - price) / market_price) * 100
             if discount_pct < DISCOUNT_THRESHOLD * 100:
+                rej["discount_too_small"] += 1
                 continue
 
             mark_seen(seen, item_id)
@@ -672,6 +715,7 @@ def run_broad(token, seen):
                      price, market_price, discount_pct, title[:50])
             send_alert(subject, body)
         log.info("  → %d new matches", matched)
+        log.info("  → rejected: %s", ", ".join(f"{k}={v}" for k, v in rej.items()))
     return total
 
 # ── Main ──────────────────────────────────────────────────────────────────────
