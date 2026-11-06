@@ -21,7 +21,7 @@ RESEND_API_KEY     = os.environ["SENDGRID_API_KEY"]
 ALERT_FROM_EMAIL   = os.environ["ALERT_FROM_EMAIL"]
 ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]
 RUN_MODE           = os.environ.get("RUN_MODE", "specific")
-BOT_VERSION        = "2026-11-06-i"  # shown in the log so you can confirm what's deployed
+BOT_VERSION        = "2026-11-06-j"  # shown in the log so you can confirm what's deployed
 
 # ── Global settings ───────────────────────────────────────────────────────────
 DISCOUNT_THRESHOLD = 0.35
@@ -104,13 +104,13 @@ SPECIFIC_ALERTS = [
     {"keywords": "1999 Blastoise 2 PSA 9",   "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 300,  "max_price": 850,  "buying_options": ["BUY_IT_NOW"]},
                {"label": "Worth an offer","min_price": 300,  "max_price": 990,  "buying_options": ["BEST_OFFER"]}]},
-    {"keywords": "1999 Venusaur 2 PSA 7",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+    {"keywords": "1999 Venusaur 15 PSA 7",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 75,   "max_price": 150,  "buying_options": ["BUY_IT_NOW"]},
                {"label": "Worth an offer","min_price": 75,   "max_price": 200,  "buying_options": ["BEST_OFFER"]}]},
-    {"keywords": "1999 Venusaur 2 PSA 8",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+    {"keywords": "1999 Venusaur 15 PSA 8",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 100,  "max_price": 248,  "buying_options": ["BUY_IT_NOW"]},
                {"label": "Worth an offer","min_price": 100,  "max_price": 300,  "buying_options": ["BEST_OFFER"]}]},
-    {"keywords": "1999 Venusaur 2 PSA 9",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
+    {"keywords": "1999 Venusaur 15 PSA 9",    "condition": "any", "exclude_keywords": POKEMON_EXCLUDES,
      "tiers": [{"label": "Steal",         "min_price": 350,  "max_price": 500,  "buying_options": ["BUY_IT_NOW"]},
                {"label": "Worth an offer","min_price": 350,  "max_price": 600,  "buying_options": ["BEST_OFFER"]}]},
     {"keywords": "1986 Michael Jordan Fleer 57 PSA 3", "condition": "any", "exclude_keywords": SPORTS_EXCLUDES,
