@@ -20,7 +20,7 @@ RESEND_API_KEY     = os.environ["SENDGRID_API_KEY"]
 ALERT_FROM_EMAIL   = os.environ["ALERT_FROM_EMAIL"]
 ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]
 RUN_MODE           = os.environ.get("RUN_MODE", "specific")
-BOT_VERSION        = "2026-11-06-d"  # shown in the log so you can confirm what's deployed
+BOT_VERSION        = "2026-11-06-e"  # shown in the log so you can confirm what's deployed
 
 # ── Global settings ───────────────────────────────────────────────────────────
 DISCOUNT_THRESHOLD = 0.35
@@ -120,6 +120,21 @@ SPECIFIC_ALERTS = [
     {"keywords": "1921 w551 uncut",   "condition": "any", "exclude_keywords": W551_EXCLUDES,
      "tiers": [{"label": "w551 Match", "min_price": 0, "max_price": 89999,  "buying_options": ["BUY_IT_NOW","BEST_OFFER"]}]},
 ]
+
+# Require the card's name in the title. eBay's keyword search also matches item
+# specifics, so a "Charizard" search returns Charmander, Ditto, etc. Without
+# this, a Charmander at the right price would fire a "Charizard" alert.
+# Listings that omit the name entirely will be skipped (counted as wrong_card).
+_NAME_RULES = {
+    "Charizard": ["Charizard"],
+    "Blastoise": ["Blastoise"],
+    "Venusaur":  ["Venusaur"],
+    "Michael Jordan": ["Jordan"],
+}
+for _alert in SPECIFIC_ALERTS:
+    for _needle, _required in _NAME_RULES.items():
+        if _needle in _alert["keywords"]:
+            _alert.setdefault("must_contain", _required)
 
 # ── Layer 2 player searches ───────────────────────────────────────────────────
 PLAYER_SEARCHES = [
@@ -285,6 +300,14 @@ def excluded_by(title, exclude_keywords):
     for kw in (exclude_keywords or []):
         if re.search(r"\b" + re.escape(kw.lower()), title_lower):
             return kw
+    return None
+
+def missing_required(title, required):
+    """Return the first required word missing from the title, else None."""
+    t = normalize_title(title).lower()
+    for word in (required or []):
+        if not re.search(r"\b" + re.escape(word.lower()), t):
+            return word
     return None
 
 def title_passes(title, exclude_keywords):
@@ -600,8 +623,9 @@ def run_specific(token, seen):
             continue
         log.info("  → %d results", len(items))
         matched = 0
-        rej = {"cooldown": 0, "seller": 0, "grade": 0, "exclude": 0,
+        rej = {"cooldown": 0, "seller": 0, "grade": 0, "wrong_card": 0, "exclude": 0,
                "below_min_price": 0, "above_max_price": 0, "buying_option": 0}
+        required_words = alert_cfg.get("must_contain")
         warned = 0
         shown_excl = 0
         near = None  # cheapest listing that passed every filter except price tier
@@ -619,6 +643,9 @@ def run_specific(token, seen):
             title = item.get("title", "")
             if not grade_matches_title(title, expected_grade):
                 rej["grade"] += 1
+                continue
+            if missing_required(title, required_words):
+                rej["wrong_card"] += 1
                 continue
             hit = excluded_by(title, exclude_kws)
             if hit:
