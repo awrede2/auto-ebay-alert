@@ -4,6 +4,7 @@ import json
 import logging
 import requests
 import time
+import urllib.parse
 from datetime import datetime, timedelta, timezone
 
 logging.basicConfig(
@@ -20,13 +21,14 @@ RESEND_API_KEY     = os.environ["SENDGRID_API_KEY"]
 ALERT_FROM_EMAIL   = os.environ["ALERT_FROM_EMAIL"]
 ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]
 RUN_MODE           = os.environ.get("RUN_MODE", "specific")
-BOT_VERSION        = "2026-11-06-e"  # shown in the log so you can confirm what's deployed
+BOT_VERSION        = "2026-11-06-h"  # shown in the log so you can confirm what's deployed
 
 # ── Global settings ───────────────────────────────────────────────────────────
 DISCOUNT_THRESHOLD = 0.35
 MIN_SOLD_SAMPLES   = 3
 TRIM_PCT           = 0.10
 COOLDOWN_HOURS     = 1500
+MAX_VERIFY_PER_RUN = 15   # cap on item-specifics lookups per run (1 API call each)
 SEEN_FILE_SPECIFIC = "seen_listings.json"
 SEEN_FILE_BROAD    = "seen_broad.json"
 
@@ -66,7 +68,7 @@ POKEMON_EXCLUDES = [
     "2000", "Portuguese", "Spanish", "French", "German", "Italian",
     "Japanese", "Korean", "Chinese", "Foreign", "Reprint", "Boxing",
     "lot", "bundle", "collection", "x2", "x3", "set of", "Base 2",
-    "AGS", "Erika's",
+    "AGS", "Erika's", "/130",
 ]
 W551_EXCLUDES  = ["Boxing", "Movie", "Reprint", "lot", "bundle"]
 SPORTS_EXCLUDES = [
@@ -131,10 +133,22 @@ _NAME_RULES = {
     "Venusaur":  ["Venusaur"],
     "Michael Jordan": ["Jordan"],
 }
+# The name alone still lets other sets through (Blaine's Charizard, M Charizard
+# EX, ...). For the 1999 Base Set cards the title must also carry a set marker:
+# "Base Set", PSA's label wording "Pokemon Game", the card number (4/102 ...),
+# or the year 1999 (Base Set's year; the look-alike Charizards are 2000+).
+_SET_MARKERS = {
+    "Charizard": ["base set", "pokemon game", "4/102", "1999"],
+    "Blastoise": ["base set", "pokemon game", "2/102", "1999"],
+    "Venusaur":  ["base set", "pokemon game", "15/102", "1999"],
+}
 for _alert in SPECIFIC_ALERTS:
     for _needle, _required in _NAME_RULES.items():
         if _needle in _alert["keywords"]:
             _alert.setdefault("must_contain", _required)
+    for _needle, _markers in _SET_MARKERS.items():
+        if _needle in _alert["keywords"]:
+            _alert.setdefault("must_contain_any", _markers)
 
 # ── Layer 2 player searches ───────────────────────────────────────────────────
 PLAYER_SEARCHES = [
@@ -309,6 +323,13 @@ def missing_required(title, required):
         if not re.search(r"\b" + re.escape(word.lower()), t):
             return word
     return None
+
+def has_any_marker(title, markers):
+    """True if no markers are required, or at least one appears in the title."""
+    if not markers:
+        return True
+    t = normalize_title(title).lower()
+    return any(re.search(r"\b" + re.escape(m.lower()), t) for m in markers)
 
 def title_passes(title, exclude_keywords):
     return excluded_by(title, exclude_keywords) is None
@@ -569,14 +590,52 @@ def send_alert(subject, body):
     else:
         log.error("Email failed: %s %s", resp.status_code, resp.text)
 
-def build_specific_alert(item, tier, alert_cfg, seller_note=None):
+def verify_base_set(token, item_id, set_markers):
+    """
+    For listings whose TITLE names the card but not the set, check the seller's
+    item specifics (eBay's separate "Set" / "Card Number" fields).
+    Returns (verified, summary). Verified only if the Set starts with "Base Set"
+    (but not "Base Set 2"), or, with no Set field, the Card Number matches.
+    """
+    try:
+        resp = requests.get(
+            "https://api.ebay.com/buy/browse/v1/item/" + urllib.parse.quote(item_id, safe=""),
+            headers={"Authorization": f"Bearer {token}",
+                     "X-EBAY-C-MARKETPLACE-ID": "EBAY_US"},
+            timeout=15,
+        )
+        if resp.status_code != 200:
+            return False, f"specifics unavailable, HTTP {resp.status_code}"
+        aspects = resp.json().get("localizedAspects") or []
+    except Exception as e:
+        return False, f"specifics unavailable, {type(e).__name__}"
+
+    pairs = [(str(a.get("name", "")), str(a.get("value", ""))) for a in aspects]
+    shown = ("set", "card number", "card name", "year manufactured")
+    summary = "; ".join(f"{n}={v}" for n, v in pairs if n.lower() in shown) or "no set info"
+
+    for n, v in pairs:
+        if n.lower() == "set":
+            sv = v.lower().strip()
+            ok = sv.startswith("base set") and not sv.startswith("base set 2")
+            return ok, summary
+
+    number_markers = [m for m in (set_markers or []) if "/" in m]
+    for n, v in pairs:
+        if n.lower() == "card number" and any(m in v.lower() for m in number_markers):
+            return True, summary
+    return False, summary
+
+def build_specific_alert(item, tier, alert_cfg, seller_note=None, listing_note=None):
     title  = item.get("title", "Unknown")
     price  = item.get("price", {}).get("value", "?")
     url    = item.get("itemWebUrl", "")
     opts   = ", ".join(item.get("buyingOptions", []))
     seller = item.get("seller", {})
-    subject = f"eBay Alert [{tier['label']}] ${price} — {title[:50]}"
+    prefix = "🔎 Possible mislisting — " if listing_note else ""
+    subject = f"{prefix}eBay Alert [{tier['label']}] ${price} — {title[:50]}"
     body = (f"Alert: {tier['label']}\nSearch: {alert_cfg['keywords']}\n\n"
+            f"{listing_note + chr(10) + chr(10) if listing_note else ''}"
             f"Title: {title}\nPrice: ${price}\nBuying options: {opts}\n"
             f"Seller: {seller.get('feedbackPercentage','?')}% "
             f"({seller.get('feedbackScore','?')} feedback)\n"
@@ -606,6 +665,7 @@ def build_broad_alert(item, player, sport, price, market_price, discount_pct, ca
 def run_specific(token, seen):
     log.info("=== LAYER 1: Specific searches ===")
     total = 0
+    verify_calls = 0
     for alert_cfg in SPECIFIC_ALERTS:
         keywords    = alert_cfg["keywords"]
         condition   = alert_cfg.get("condition", "any")
@@ -623,9 +683,12 @@ def run_specific(token, seen):
             continue
         log.info("  → %d results", len(items))
         matched = 0
-        rej = {"cooldown": 0, "seller": 0, "grade": 0, "wrong_card": 0, "exclude": 0,
+        rej = {"cooldown": 0, "seller": 0, "grade": 0, "wrong_card": 0, "unverified": 0, "exclude": 0,
                "below_min_price": 0, "above_max_price": 0, "buying_option": 0}
         required_words = alert_cfg.get("must_contain")
+        set_markers = alert_cfg.get("must_contain_any")
+        shown_wrong = 0
+        shown_unver = 0
         warned = 0
         shown_excl = 0
         near = None  # cheapest listing that passed every filter except price tier
@@ -646,6 +709,9 @@ def run_specific(token, seen):
                 continue
             if missing_required(title, required_words):
                 rej["wrong_card"] += 1
+                if shown_wrong < 3:
+                    log.info("  · not the target card: %s", title[:70])
+                    shown_wrong += 1
                 continue
             hit = excluded_by(title, exclude_kws)
             if hit:
@@ -654,6 +720,8 @@ def run_specific(token, seen):
                     log.info("  · excluded by '%s': %s", hit, title[:70])
                     shown_excl += 1
                 continue
+            # The title names the card but not the set: a possible mislisting.
+            ambiguous = not has_any_marker(title, set_markers)
             tier = match_tier(item, tiers)
             if not tier:
                 try:
@@ -666,21 +734,39 @@ def run_specific(token, seen):
                     rej["above_max_price"] += 1
                 else:
                     rej["buying_option"] += 1
-                if p < min_tier_price:
-                    dist = min_tier_price - p
-                elif p > max_tier_price:
-                    dist = p - max_tier_price
-                else:
-                    dist = 0.0  # in the price window; failed on buying option
-                if near is None or (dist, p) < (near[2], near[0]):
-                    near = (p, title[:60], dist)
+                if not ambiguous:  # keep "closest miss" to listings we're sure about
+                    if p < min_tier_price:
+                        dist = min_tier_price - p
+                    elif p > max_tier_price:
+                        dist = p - max_tier_price
+                    else:
+                        dist = 0.0
+                    if near is None or (dist, p) < (near[2], near[0]):
+                        near = (p, title[:60], dist)
                 continue
+            listing_note = None
+            if ambiguous:
+                # Only worth an API call if it would otherwise be an alert.
+                if verify_calls >= MAX_VERIFY_PER_RUN:
+                    rej["unverified"] += 1
+                    continue
+                verify_calls += 1
+                verified, specifics = verify_base_set(token, item_id, set_markers)
+                if not verified:
+                    rej["unverified"] += 1
+                    if shown_unver < 3:
+                        log.info("  · title names no set and specifics don't confirm (%s): %s",
+                                 specifics, title[:60])
+                        shown_unver += 1
+                    continue
+                listing_note = ("🔎 Possible mislisting: the title doesn't name the set, "
+                                "but the seller's item specifics do — " + specifics)
             if seller_note:
                 warned += 1
             mark_seen(seen, item_id)
             matched += 1
             total += 1
-            subject, body = build_specific_alert(item, tier, alert_cfg, seller_note)
+            subject, body = build_specific_alert(item, tier, alert_cfg, seller_note, listing_note)
             log.info("  MATCH [%s] $%s — %s", tier["label"],
                      item.get("price", {}).get("value", "?"), title[:50])
             send_alert(subject, body)
