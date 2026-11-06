@@ -267,12 +267,20 @@ def extract_set(title, sport):
         return None
 
 # ── Filters ───────────────────────────────────────────────────────────────────
-def title_passes(title, exclude_keywords):
+def excluded_by(title, exclude_keywords):
+    """
+    Return the first exclude keyword found in the title, else None.
+    Matches from the START of a word, so "lot" catches "lot"/"lots" but not
+    "slot"/"pilot", and "AGS" catches "AGS 10" but not "bags"/"tags".
+    """
     title_lower = title.lower()
     for kw in (exclude_keywords or []):
-        if kw.lower() in title_lower:
-            return False
-    return True
+        if re.search(r"\b" + re.escape(kw.lower()), title_lower):
+            return kw
+    return None
+
+def title_passes(title, exclude_keywords):
+    return excluded_by(title, exclude_keywords) is None
 
 # ── Seller trust settings ─────────────────────────────────────────────────────
 # Hard floors: below these the listing is dropped (cards under HIGH_VALUE_PRICE)
@@ -587,6 +595,7 @@ def run_specific(token, seen):
         rej = {"cooldown": 0, "seller": 0, "grade": 0, "exclude": 0,
                "below_min_price": 0, "above_max_price": 0, "buying_option": 0}
         warned = 0
+        shown_excl = 0
         near = None  # cheapest listing that passed every filter except price tier
         min_tier_price = min(float(t.get("min_price", 0)) for t in tiers)
         max_tier_price = max(float(t["max_price"]) for t in tiers)
@@ -603,8 +612,12 @@ def run_specific(token, seen):
             if not grade_matches_title(title, expected_grade):
                 rej["grade"] += 1
                 continue
-            if not title_passes(title, exclude_kws):
+            hit = excluded_by(title, exclude_kws)
+            if hit:
                 rej["exclude"] += 1
+                if shown_excl < 3:
+                    log.info("  · excluded by '%s': %s", hit, title[:70])
+                    shown_excl += 1
                 continue
             tier = match_tier(item, tiers)
             if not tier:
