@@ -267,13 +267,20 @@ def extract_set(title, sport):
         return None
 
 # ── Filters ───────────────────────────────────────────────────────────────────
+import unicodedata
+_INVISIBLE = dict.fromkeys(map(ord, "\u200b\u200c\u200d\u200e\u200f\u2060\u00ad\ufeff"), None)
+
+def normalize_title(title):
+    """Strip zero-width/soft-hyphen characters and fold compatibility forms."""
+    return unicodedata.normalize("NFKC", title).translate(_INVISIBLE)
+
 def excluded_by(title, exclude_keywords):
     """
     Return the first exclude keyword found in the title, else None.
     Matches from the START of a word, so "lot" catches "lot"/"lots" but not
     "slot"/"pilot", and "AGS" catches "AGS 10" but not "bags"/"tags".
     """
-    title_lower = title.lower()
+    title_lower = normalize_title(title).lower()
     for kw in (exclude_keywords or []):
         if re.search(r"\b" + re.escape(kw.lower()), title_lower):
             return kw
@@ -646,7 +653,7 @@ def run_specific(token, seen):
         log.info("  → %d new matches (%d with seller warning)", matched, warned)
         log.info("  → rejected: %s", ", ".join(f"{k}={v}" for k, v in rej.items()))
         if near and matched == 0:
-            log.info("  → closest miss: $%.2f — %s", near[0], near[1])
+            log.info("  → closest miss: $%.2f — %s", near[0], ascii(near[1]))
     return total
 
 # ── Layer 2 ───────────────────────────────────────────────────────────────────
