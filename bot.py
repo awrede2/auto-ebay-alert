@@ -20,6 +20,7 @@ RESEND_API_KEY     = os.environ["SENDGRID_API_KEY"]
 ALERT_FROM_EMAIL   = os.environ["ALERT_FROM_EMAIL"]
 ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]
 RUN_MODE           = os.environ.get("RUN_MODE", "specific")
+BOT_VERSION        = "2026-11-06-d"  # shown in the log so you can confirm what's deployed
 
 # ── Global settings ───────────────────────────────────────────────────────────
 DISCOUNT_THRESHOLD = 0.35
@@ -638,8 +639,14 @@ def run_specific(token, seen):
                     rej["above_max_price"] += 1
                 else:
                     rej["buying_option"] += 1
-                if near is None or p < near[0]:
-                    near = (p, title[:60])
+                if p < min_tier_price:
+                    dist = min_tier_price - p
+                elif p > max_tier_price:
+                    dist = p - max_tier_price
+                else:
+                    dist = 0.0  # in the price window; failed on buying option
+                if near is None or (dist, p) < (near[2], near[0]):
+                    near = (p, title[:60], dist)
                 continue
             if seller_note:
                 warned += 1
@@ -653,7 +660,8 @@ def run_specific(token, seen):
         log.info("  → %d new matches (%d with seller warning)", matched, warned)
         log.info("  → rejected: %s", ", ".join(f"{k}={v}" for k, v in rej.items()))
         if near and matched == 0:
-            log.info("  → closest miss: $%.2f — %s", near[0], ascii(near[1]))
+            log.info("  → closest miss: $%.2f (your window $%.0f–$%.0f) — %s",
+                     near[0], min_tier_price, max_tier_price, ascii(near[1]))
     return total
 
 # ── Layer 2 ───────────────────────────────────────────────────────────────────
@@ -740,7 +748,7 @@ def run_broad(token, seen):
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 def main():
-    log.info("eBay Alert Bot starting — mode: %s", RUN_MODE)
+    log.info("eBay Alert Bot starting — mode: %s — version %s", RUN_MODE, BOT_VERSION)
     token = get_ebay_token()
     log.info("eBay token acquired")
     if RUN_MODE == "specific":
