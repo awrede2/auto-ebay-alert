@@ -21,7 +21,7 @@ RESEND_API_KEY     = os.environ["SENDGRID_API_KEY"]
 ALERT_FROM_EMAIL   = os.environ["ALERT_FROM_EMAIL"]
 ALERT_TO_EMAIL     = os.environ["ALERT_TO_EMAIL"]
 RUN_MODE           = os.environ.get("RUN_MODE", "specific")
-BOT_VERSION        = "2026-11-06-h"  # shown in the log so you can confirm what's deployed
+BOT_VERSION        = "2026-11-06-i"  # shown in the log so you can confirm what's deployed
 
 # ── Global settings ───────────────────────────────────────────────────────────
 DISCOUNT_THRESHOLD = 0.35
@@ -69,6 +69,7 @@ POKEMON_EXCLUDES = [
     "Japanese", "Korean", "Chinese", "Foreign", "Reprint", "Boxing",
     "lot", "bundle", "collection", "x2", "x3", "set of", "Base 2",
     "AGS", "Erika's", "/130",
+    "sticker", "flipz", "artbox",
 ]
 W551_EXCLUDES  = ["Boxing", "Movie", "Reprint", "lot", "bundle"]
 SPORTS_EXCLUDES = [
